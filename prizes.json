@@ -1,0 +1,26 @@
+[
+  {
+    "name": "\u00a350 Voucher",
+    "weight": 10,
+    "enabled": "TRUE",
+    "stock": 5
+  },
+  {
+    "name": "T-Shirt",
+    "weight": 20,
+    "enabled": "TRUE",
+    "stock": 12
+  },
+  {
+    "name": "Mug",
+    "weight": 15,
+    "enabled": "TRUE",
+    "stock": 16
+  },
+  {
+    "name": "Grand Prize",
+    "weight": 1,
+    "enabled": "TRUE",
+    "stock": 1
+  }
+]
