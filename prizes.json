@@ -1,26 +1,44 @@
 [
   {
-    "name": "\u00a350 Voucher",
+    "name": "UMBRELLA",
     "weight": 10,
     "enabled": "TRUE",
-    "stock": 5
+    "stock": 50
   },
   {
-    "name": "T-Shirt",
+    "name": "WIRELESS CHARGER",
     "weight": 20,
     "enabled": "TRUE",
-    "stock": 12
+    "stock": 500
   },
   {
-    "name": "Mug",
+    "name": "5-IN-1 CHARGER",
     "weight": 15,
     "enabled": "TRUE",
-    "stock": 16
+    "stock": 500
   },
   {
-    "name": "Grand Prize",
+    "name": "BEANIE",
     "weight": 1,
     "enabled": "TRUE",
-    "stock": 1
+    "stock": 500
+  }
+  {
+    "name": "TROLLEY COIN",
+    "weight": 1,
+    "enabled": "TRUE",
+    "stock": 500
+  }
+  {
+    "name": "LANYARD",
+    "weight": 1,
+    "enabled": "TRUE",
+    "stock": 500
+  }
+  {
+    "name": "PEN",
+    "weight": 1,
+    "enabled": "TRUE",
+    "stock": 250
   }
 ]
