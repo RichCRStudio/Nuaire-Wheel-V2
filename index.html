@@ -33,7 +33,7 @@
       padding:16px; width:100%; height:100%;
     }
     /* Keep wheel sizing/layout as before */
-    #wrap {
+    #wrap { transform: scale(3); transform-origin: top center;
       position: relative;
       width: 90vw;
       height: calc(90vw + 220px);
@@ -103,7 +103,7 @@
     pointer-events: none;      /* don't block clicks */
   }
   #brandLogo svg {
-    width: 200px;              /* tweak size here */
+    width: 600px;              /* tweak size here */
     height: auto;
     display: block;
   }
@@ -187,7 +187,7 @@
 
   <script>
   // --- Embedded asset payloads ---
-  const BG_VIEWBOX = { minX: 0.0, minY: 0.0, width: 2200.0, height: 3900.0 };
+  const BG_VIEWBOX = { minX: 0.0, minY: 0.0, width: 2166.0, height: 3839.0 };
   const BG_DEFS = `<defs>
     <style>
       .cls-1 {
