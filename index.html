@@ -30,10 +30,20 @@
     <p style="opacity:.8">Please check back later.</p>
 </div>
 
-<div id="congratsMsg" class="fade" style="position:absolute; inset:0; display:grid; place-items:center;">
-  <div style="background:rgba(255,255,255,.95); padding:30px 40px; border-radius:16px; text-align:center; max-width:400px;">
-    <h2 style="margin:0 0 12px;">Congratulations!<br/>You just won a prize!</h2>
-    <p id="congratsPrize" style="margin:0; font-size:1.1em;"></p>
+<div id="congratsMsg" aria-live="polite" aria-hidden="true">
+  <!-- MP4 background -->
+  <video class="bg-video" autoplay muted playsinline loop>
+    <source src="img/AdobeStock_276084056 smaller.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Centered card -->
+  <div class="card">
+    <!-- Optional hero image (remove if not needed) -->
+    <!-- <img class="prize-img" src="assets/prize.png" alt="" /> -->
+
+    <h3>AWESOME!!</h3><br>
+    <h2>YOU'VE WON</h2>
+    <p id="congratsPrize"></p>
   </div>
 </div>
 

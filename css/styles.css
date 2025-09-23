@@ -72,6 +72,93 @@ body {
 
 
 
+
+
+/* Full-screen congrats overlay (hidden by default) */
+#congratsMsg {
+  position: fixed;            /* cover whole screen */
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+
+  opacity: 0;
+  pointer-events: none;       /* clicks pass through when hidden */
+  transition: opacity 250ms ease;
+}
+
+/* Show state you can toggle from JS */
+#congratsMsg.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Background video fills screen behind the card */
+#congratsMsg .bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* crop to fill */
+  object-position: center;
+  z-index: -1;                /* behind the card */
+  filter: brightness(0.85);   /* subtle dim so text pops */
+}
+
+/* Optional dark scrim over video for contrast */
+#congratsMsg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+	to bottom,
+	rgba(0, 0, 0, 0) 0%,    /* fully transparent at top */
+	rgba(0, 0, 0, 0.9) 60%
+  );
+  z-index: 3;
+}
+
+/* Center card */
+#congratsMsg .card {
+  padding: 28px 36px;
+  text-align: center;
+  z-index: 5;
+}
+
+/* Optional image at the top of the card */
+#congratsMsg .card img.prize-img {
+  display: block;
+  width: 90%;
+  max-width: 800px;
+  height: auto;
+  margin: 0 auto 12px;
+}
+
+#congratsMsg h2, #congratsMsg h3, #congratsMsg #congratsPrize {
+  margin: 0 0 10px;
+  font-size: 5rem;
+  line-height: 1.2;
+  color: #ffffff;
+}
+#congratsMsg h3 {
+	font-size: 4rem;
+}
+#congratsMsg #congratsPrize {
+	font-size: 3rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 .keyboard {
 	width: min(90vw, 800px);
 	display: none;
