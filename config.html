@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Prize Config (v80)</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: Arial, sans-serif;
+				margin: 16px;
+				max-width: 800px;
+			}
+			textarea {
+				width: 100%;
+				min-height: 260px;
+				font-family: ui-monospace, Menlo, Consolas, monospace;
+			}
+			.row {
+				display: flex;
+				gap: 8px;
+				align-items: center;
+				margin: 8px 0;
+				flex-wrap: wrap;
+			}
+			button {
+				padding: 8px 12px;
+			}
+			.hint {
+				color: #555;
+			}
+
+			/* gate overlay */
+			#gate {
+				position: fixed;
+				inset: 0;
+				display: grid;
+				place-items: center;
+				background: rgba(0, 0, 0, 0.5);
+				z-index: 9999;
+			}
+			#gateCard {
+				width: min(92vw, 380px);
+				background: #fff;
+				border-radius: 12px;
+				padding: 20px 22px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+			}
+			#gateCard h2 {
+				margin: 0 0 10px;
+			}
+			#gateForm {
+				display: grid;
+				gap: 10px;
+			}
+			#gateForm input[type="password"] {
+				padding: 10px 12px;
+				font-size: 16px;
+				width: 100%;
+				border: 1px solid #ccc;
+				border-radius: 8px;
+			}
+			#gateErr {
+				color: #b00020;
+				min-height: 1.1em;
+				font-size: 0.95em;
+			}
+			#content[hidden] {
+				display: none !important;
+			}
+		</style>
+
+        <script src="js/consts.js"></script>
+        <script src="js/sync.js"></script>
+        
+    
+		<script>
+			// ===== Password gate =====
+			const PASSWORD = "nuaireadmin"; // <-- change me
+			const SESSION_KEY = "config_unlocked_v1"; // sessionStorage flag
+
+			// Run ASAP to keep content hidden until validated
+			document.addEventListener("DOMContentLoaded", () => {
+				const content = document.getElementById("content");
+				const gate = document.getElementById("gate");
+				const passIn = document.getElementById("gatePass");
+				const errEl = document.getElementById("gateErr");
+
+				function unlock() {
+					gate.style.display = "none";
+					content.hidden = false;
+					sessionStorage.setItem(SESSION_KEY, "1");
+				}
+				function lock() {
+					sessionStorage.removeItem(SESSION_KEY);
+					content.hidden = true;
+					gate.style.display = "grid";
+					passIn.value = "";
+					errEl.textContent = "";
+					passIn.focus();
+				}
+
+				// Already unlocked this tab?
+				if (sessionStorage.getItem(SESSION_KEY) === "1") {
+					unlock();
+				} else {
+					content.hidden = true;
+					gate.style.display = "grid";
+					// focus once visible
+					setTimeout(() => passIn.focus(), 0);
+				}
+
+				// Handle submit
+				document
+					.getElementById("gateForm")
+					.addEventListener("submit", (e) => {
+						e.preventDefault();
+						if (passIn.value === PASSWORD) {
+							unlock();
+						} else {
+							errEl.textContent = "Incorrect password";
+							passIn.select();
+						}
+					});
+
+				// Expose logout for a small link/button inside the page
+				window.configLogout = lock;
+			});
+		</script>
+	</head>
+	<body>
+		<!-- Password overlay -->
+		<div id="gate" style="display: none">
+			<div id="gateCard">
+				<h2>Restricted</h2>
+				<p class="hint" style="margin: 0 0 10px">
+					Enter the password to access config.
+				</p>
+				<form id="gateForm">
+					<input
+						id="gatePass"
+						type="password"
+						placeholder="Password"
+						autocomplete="current-password"
+						required
+					/>
+					<div id="gateErr"></div>
+					<button type="submit">Unlock</button>
+				</form>
+			</div>
+		</div>
+
+		<div id="content" hidden>
+			<h1>Prize Config (v80)</h1>
+			<p class="hint">
+				CSV headers required: <b>name,weight,enabled,stock</b>. Click
+				<i>Insert Original</i>, then <i>Save to Browser</i>. Open
+				<code>index.html</code> and click <i>Reload data</i>.
+			</p>
+			<div class="row">
+        
+                <button id="resetData">Reset to Original Prizes</button>
+				<button id="insertOriginal">Insert Original</button>
+				<button id="insertCurrent">Insert Current</button>
+				<button id="saveData">Save to Browser</button>
+
+				<span id="status" class="hint"></span>
+			</div>
+
+			<textarea id="csv"></textarea>
+
+			<button id="download">Download Prizes JSON</button>
+			<button id="downloadContacts">Download Contacts CSV</button>
+			<button id="syncContacts">Sync Contacts</button>
+		</div>
+
+		<script>
+			const LS_KEY = "prizes_minimal_v2";
+			function parseCSV(text) {
+				const lines = text
+					.split(/\r?\n/)
+					.map((l) => l.trim())
+					.filter(Boolean);
+				if (!lines.length) return [];
+				const header = lines[0].replace(/^\uFEFF/, ""); // strip BOM
+				const headers = header
+					.split(",")
+					.map((h) => h.trim().toLowerCase());
+				const idx = Object.fromEntries(headers.map((h, i) => [h, i]));
+				const out = [];
+				for (let i = 1; i < lines.length; i++) {
+					const cells = lines[i].split(",").map((c) => c.trim());
+					out.push({
+						name: cells[idx.name] || "",
+						weight: Number(cells[idx.weight] || 1),
+						enabled: cells[idx.enabled] || "TRUE",
+						stock: Number(cells[idx.stock] || 0),
+					});
+				}
+				return out;
+			}
+			function toCSV(rows) {
+				const lines = ["name,weight,enabled,stock"];
+				rows.forEach((r) =>
+					lines.push(
+						[
+							r.name,
+							r.weight ?? 1,
+							r.enabled ?? "TRUE",
+							r.stock ?? 0,
+						].join(","),
+					),
+				);
+				return lines.join("\n");
+			}
+      
+			function getLocal() {
+				try {
+					return JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+				} catch {
+					return [];
+				}
+			}
+      
+			function setLocal(rows) {
+				localStorage.setItem(LS_KEY, JSON.stringify(rows));
+			}
+
+			const ta = document.getElementById("csv");
+			const status = document.getElementById("status");
+          
+          
+            function insertOriginal()
+            {
+              ta.value = jsonToCsv(initData);
+              status.textContent = "Original inserted.";
+            }
+            
+            function insertCurrent()
+            {
+              ta.value = jsonToCsv(initData);
+              status.textContent = "Original inserted.";
+            }
+            
+            function saveData()
+            {
+              const rows = parseCSV(ta.value);
+              setLocal(rows);
+              status.textContent = "Saved to browser. (Now open index.html and click Reload data)";
+            }
+            
+            
+            document.getElementById("resetData").onclick = () => {
+                insertOriginal();
+                saveData();
+            };
+            
+			document.getElementById("insertOriginal").onclick = () => {
+              insertOriginal();
+			};
+      
+			document.getElementById("insertCurrent").onclick = () => {
+              insertCurrent();
+			};
+      
+			document.getElementById("saveData").onclick = () => {
+              saveData();
+			};
+
+
+
+			document.getElementById("download").onclick = () => {
+				const rows = parseCSV(ta.value);
+				const blob = new Blob([JSON.stringify(rows, null, 2)], {
+					type: "application/json",
+				});
+				const a = document.createElement("a");
+				a.href = URL.createObjectURL(blob);
+				a.download = "prizes.json";
+				a.click();
+				URL.revokeObjectURL(a.href);
+				status.textContent = "Downloaded prizes.json";
+			};
+
+			document.getElementById("downloadContacts").onclick = () => {
+				const csv = jsonToCsv(
+					JSON.parse(localStorage.getItem("wheel_users")),
+				);
+				const blob = new Blob(["\uFEFF" + csv], {
+					type: "text/csv;charset=utf-8",
+				});
+				const a = document.createElement("a");
+				a.href = URL.createObjectURL(blob);
+				a.download = "contacts.csv";
+				a.click();
+				URL.revokeObjectURL(a.href);
+				status.textContent = "Downloaded contacts.json";
+			};
+
+			document.getElementById("syncContacts").onclick = () => {
+				syncWheelUsers();
+			};
+
+
+
+      function clearLocalPrizes() {
+        if (
+          confirm(
+            "Are you sure you want to reset prizes to the original? This cannot be undone.",
+          )
+        ) {
+          setLocalPrizes(initData);
+          showForm();
+          loadData();
+          status.textContent = "Downloaded contacts.json";
+        } else {
+          // User cancelled — do nothing
+          console.log("Reset cancelled");
+        }
+      }
+      
+      document.getElementById("reloadBtn").onclick = () => {
+        clearLocalPrizes();
+      };
+
+
+
+
+
+
+
+			// Convert JSON → CSV
+			function jsonToCsv(arr) {
+				if (!arr.length) return "";
+				const header = Object.keys(arr[0]).join(",");
+				const rows = arr.map((obj) => Object.values(obj).join(","));
+				return [header].concat(rows).join("\n");
+			}
+      
+		</script>
+	</body>
+</html>
