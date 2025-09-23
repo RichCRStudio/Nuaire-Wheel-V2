@@ -1,0 +1,19 @@
+/*CONST initData = [
+	{ "name": "UMBRELLA",         "weight": 10, "enabled": "TRUE", "stock": 50  },
+	{ "name": "WIRELESS CHARGER", "weight": 20, "enabled": "TRUE", "stock": 500 },
+	{ "name": "5-IN-1 CHARGER",   "weight": 15, "enabled": "TRUE", "stock": 500 },
+	{ "name": "BEANIE",           "weight": 1,  "enabled": "TRUE", "stock": 500 },
+	{ "name": "TROLLEY COIN",     "weight": 1,  "enabled": "TRUE", "stock": 500 },
+	{ "name": "LANYARD",          "weight": 1,  "enabled": "TRUE", "stock": 500 },
+	{ "name": "PEN",              "weight": 1,  "enabled": "TRUE", "stock": 250 }
+];*/
+
+const initData = [
+	{ name: "UMBRELLA", weight: 10, enabled: "TRUE", stock: 1 },
+	{ name: "WIRELESS CHARGER", weight: 20, enabled: "TRUE", stock: 1 },
+	{ name: "5-IN-1 CHARGER", weight: 15, enabled: "TRUE", stock: 1 },
+	{ name: "BEANIE", weight: 1, enabled: "TRUE", stock: 1 },
+	{ name: "TROLLEY COIN", weight: 1, enabled: "TRUE", stock: 1 },
+	{ name: "LANYARD", weight: 1, enabled: "TRUE", stock: 1 },
+	{ name: "PEN", weight: 1, enabled: "TRUE", stock: 1 },
+];
