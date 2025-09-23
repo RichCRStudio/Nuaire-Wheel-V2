@@ -64,8 +64,15 @@
 	async function onSpinEnd(prizeName) {
 	  // Update congratulations text
 	  const prizeEl = document.getElementById('congratsPrize');
-	  if (prizeEl) prizeEl.textContent = `You won a ${prizeName}`;
-	  
+	  /*if (prizeEl) prizeEl.innerHTML = `
+	  A ${prizeName}<br/><br/><br/>
+	  <img class="prize-img" src="img/${prizeName}.png"/>
+	  `;*/
+	  if (prizeEl) prizeEl.innerHTML = `
+		<br/><br/><br/>
+		<img class="prize-img" src="img/${prizeName}.png"/>
+		`;
+		
 	  // Show congratulations message
 	  
 	  setTimeout(() => {
@@ -76,7 +83,7 @@
 		// Hide message
 			congratsMsg?.classList.remove('show');
 			loadData();
-	  	}, 5000);
+	  	}, 10000);
 	  }, 2000);
 	  
 	}
