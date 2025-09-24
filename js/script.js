@@ -76,7 +76,6 @@
 		<img class="prize-img" src="img/${prizeName}.png"/>
 		`;*/
 		if (prizeEl) prizeEl.innerHTML = `
-		<br/><br/><br/>
 		<img class="prize-img" src="img/${prizeName}.png"/>
 		`;
 
