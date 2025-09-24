@@ -355,10 +355,14 @@ body
 
 .keyboard
 {
+	position: fixed;
+	top: 65%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
 	width: min(1200px, 92vw);
 	display: none;
 	z-index: 999999;
-	position: relative;
 	margin: auto;
 	margin-top: 100px;
 }
