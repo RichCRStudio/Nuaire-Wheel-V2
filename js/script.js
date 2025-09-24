@@ -1,8 +1,12 @@
-(function () {
-	
-	
+(function ()
+{
+
+
+	//document.getElementById('standLayer').innerHTML = STAND_BODY;
+
+
 	const FORM_KEY = "wheel_users";
-	
+
 	const formWrap = document.getElementById("userFormWrap");
 	const form = document.getElementById("userForm");
 	const wheelWrap = document.getElementById("wheelWrap");
@@ -11,24 +15,28 @@
 
 	showForm();
 
-	function showForm() {
+	function showForm()
+	{
 		formWrap.classList.add("show");
 		wheelWrap.classList.remove("show");
 		congratsMsg.classList.remove("show");
 	}
-	function hideFormAndWheel() {
+	function hideFormAndWheel()
+	{
 		formWrap.classList.remove("show");
 		wheelWrap.classList.remove("show");
 	}
 
-	function showWheel() {
+	function showWheel()
+	{
 		wheelWrap.classList.add("show");
 		formWrap.classList.remove("show");
 	}
 
 
 	// Handle form submit
-	form.addEventListener("submit", (e) => {
+	form.addEventListener("submit", (e) =>
+	{
 		e.preventDefault();
 
 		// Build the new record
@@ -54,70 +62,80 @@
 		form.reset();
 
 		showWheel();
-		
-		
+
+
 	});
 
 	// Hook into your spin finish callback
-	async function onSpinEnd(prizeName) {
-	  // Update congratulations text
-	  const prizeEl = document.getElementById('congratsPrize');
-	  /*if (prizeEl) prizeEl.innerHTML = `
-	  A ${prizeName}<br/><br/><br/>
-	  <img class="prize-img" src="img/${prizeName}.png"/>
-	  `;*/
-	  if (prizeEl) prizeEl.innerHTML = `
+	async function onSpinEnd(prizeName)
+	{
+		// Update congratulations text
+		const prizeEl = document.getElementById('congratsPrize');
+		/*if (prizeEl) prizeEl.innerHTML = `
+		A ${prizeName}<br/><br/><br/>
+		<img class="prize-img" src="img/${prizeName}.png"/>
+		`;*/
+		if (prizeEl) prizeEl.innerHTML = `
 		<br/><br/><br/>
 		<img class="prize-img" src="img/${prizeName}.png"/>
 		`;
-		
-	  // Show congratulations message
-	  
-	  setTimeout(() => {
-		hideFormAndWheel();
-		congratsMsg?.classList.add('show');
 
-		setTimeout(() => {
-		// Hide message
-			congratsMsg?.classList.remove('show');
-			loadData();
-	  	}, 10000);
-	  }, 2000);
-	  
+		// Show congratulations message
+
+		setTimeout(() =>
+		{
+			hideFormAndWheel();
+			congratsMsg?.classList.add('show');
+
+			setTimeout(() =>
+			{
+				// Hide message
+				congratsMsg?.classList.remove('show');
+				loadData();
+			}, 10000);
+		}, 2000);
+
 	}
 
 	// --- Data storage ---
 	const LS_KEY = "prizes_minimal_v2";
 
-	function getLocalPrizes() {
-		try {
+	function getLocalPrizes()
+	{
+		try
+		{
 			return JSON.parse(localStorage.getItem(LS_KEY) || "[]");
 		} catch {
 			return [];
 		}
 	}
 
-	function setLocalPrizes(rows) {
+	function setLocalPrizes(rows)
+	{
 		localStorage.setItem(LS_KEY, JSON.stringify(rows));
 	}
 
-	function clearLocalPrizes() {
+	function clearLocalPrizes()
+	{
 		if (
 			confirm(
 				"Are you sure you want to reset prizes to the original? This cannot be undone.",
 			)
-		) {
+		)
+		{
 			setLocalPrizes(initData);
 			showForm();
 			loadData();
-		} else {
+		} else
+		{
 			// User cancelled — do nothing
 			console.log("Reset cancelled");
 		}
 	}
 
 	// --- Initialise only if not already present ---
-	if (!localStorage.getItem(LS_KEY)) {
+	if (!localStorage.getItem(LS_KEY))
+	{
 		setLocalPrizes(initData);
 	}
 
@@ -131,7 +149,8 @@
 	// --- Colors (gradient across slices) ---
 	const COLOR_A = "#009fdf";
 	const COLOR_B = "#86cedd";
-	function hexToRgb(h) {
+	function hexToRgb(h)
+	{
 		const s = h.replace("#", "");
 		return {
 			r: parseInt(s.slice(0, 2), 16),
@@ -139,12 +158,14 @@
 			b: parseInt(s.slice(4, 6), 16),
 		};
 	}
-	function lerp(a, b, t) {
+	function lerp(a, b, t)
+	{
 		return a + (b - a) * t;
 	}
 	const RGB_A = hexToRgb(COLOR_A);
 	const RGB_B = hexToRgb(COLOR_B);
-	function lerpColorCss(t) {
+	function lerpColorCss(t)
+	{
 		const r = Math.round(lerp(RGB_A.r, RGB_B.r, t)),
 			g = Math.round(lerp(RGB_A.g, RGB_B.g, t)),
 			b = Math.round(lerp(RGB_A.b, RGB_B.b, t));
@@ -157,16 +178,19 @@
 	const log = document.getElementById("log");
 
 	// --- Helpers ---
-	function polarToXY(r, a) {
+	function polarToXY(r, a)
+	{
 		return [(r * Math.cos(a)).toFixed(2), (r * Math.sin(a)).toFixed(2)];
 	}
-	function arcWedgePath(r, start, end) {
+	function arcWedgePath(r, start, end)
+	{
 		const [x1, y1] = polarToXY(r, start);
 		const [x2, y2] = polarToXY(r, end);
 		const large = end - start > Math.PI ? 1 : 0;
 		return `M 0 0 L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
 	}
-	function setWheelRotation(deg) {
+	function setWheelRotation(deg)
+	{
 		gWheel.setAttribute("transform", `rotate(${deg})`);
 	}
 
@@ -183,7 +207,8 @@
 		}
 	}*/
 
-	function mountPageBackground() {
+	function mountPageBackground()
+	{
 		const bg = document.getElementById("pageBg");
 		if (!bg) return;
 		bg.setAttribute(
@@ -194,10 +219,12 @@
 	}
 
 	// --- Static (non-rotating) center logo ---
-	function placeStaticLogo(hubR) {
+	function placeStaticLogo(hubR)
+	{
 		// mount defs under root for safety
 		let defsLayer = document.getElementById("logoDefs");
-		if (!defsLayer) {
+		if (!defsLayer)
+		{
 			defsLayer = document.createElementNS(
 				"http://www.w3.org/2000/svg",
 				"g",
@@ -227,7 +254,8 @@
 	}
 
 	// --- Build wheel (NO stand, NO pointer) ---
-	function buildWheel() {
+	function buildWheel()
+	{
 		const R = 300;
 		const rimColor = "#232E49";
 		const rimPx = Math.max(12, Math.floor(R * 0.06));
@@ -238,7 +266,8 @@
 
 		// Slices + labels + separators
 		const rSlice = R - 4;
-		for (let i = 0; i < N; i++) {
+		for (let i = 0; i < N; i++)
+		{
 			const start = i * slice - Math.PI / 2;
 			const end = start + slice;
 			const t = N > 1 ? i / (N - 1) : 0.5;
@@ -342,7 +371,8 @@
 	}
 
 	// --- Static pointer drawn inside the wheel SVG (does not rotate) ---
-	function placeStaticPointer(R) {
+	function placeStaticPointer(R)
+	{
 		const svg = document.getElementById("wheelSvg");
 		if (!svg) return;
 		const ns = "http://www.w3.org/2000/svg";
@@ -358,8 +388,10 @@
 		const W0 = Math.max(24, Math.floor(H0 * 0.6));
 		const H = Math.round(H0 * scaleFactor);
 		// Helper: build a rounded-corner triangle path using quadratic curves
-		function triRoundedPath(ax, ay, bx, by, cx, cy, r) {
-			function off(x1, y1, x2, y2, d) {
+		function triRoundedPath(ax, ay, bx, by, cx, cy, r)
+		{
+			function off(x1, y1, x2, y2, d)
+			{
 				const vx = x2 - x1,
 					vy = y2 - y1;
 				const L = Math.hypot(vx, vy) || 1;
@@ -440,44 +472,48 @@
 	}
 
 
-	function toggleSoldOutUI(isSoldOut) {
-	
-	  if (isSoldOut) {
-		formWrap?.classList.remove('show');
-		wheelWrap?.classList.remove('show');
-		soldOutMsg?.classList.add('show');
-	  } else {
-		soldOutMsg?.classList.remove('show');
-		// Your normal logic can decide which one shows (form or wheel).
-		// If you always want the wheel visible when not sold-out:
-		wheelWrap?.classList.remove('show');
-	  }
+	function toggleSoldOutUI(isSoldOut)
+	{
+
+		if (isSoldOut)
+		{
+			formWrap?.classList.remove('show');
+			wheelWrap?.classList.remove('show');
+			soldOutMsg?.classList.add('show');
+		} else
+		{
+			soldOutMsg?.classList.remove('show');
+			// Your normal logic can decide which one shows (form or wheel).
+			// If you always want the wheel visible when not sold-out:
+			wheelWrap?.classList.remove('show');
+		}
 	}
-	
-	
+
+
 	// --- Data/load ---
-	function loadData() {
+	function loadData()
+	{
 		const all = getLocalPrizes();
 
 		// …inside your load/refresh function, right after filtering:
-		const active = all.filter(p => String(p.enabled).toUpperCase()==='TRUE' && Number(p.stock)>0);
+		const active = all.filter(p => String(p.enabled).toUpperCase() === 'TRUE' && Number(p.stock) > 0);
 		const numPrizesLeft = active.length;
-		
+
 		// NEW: if nothing left, show message and bail
 		if (numPrizesLeft === 0)
 		{
-		  toggleSoldOutUI(true);
-		  // Optionally also update any status text:
-		  const log = document.getElementById('log');
-		  if (log) log.textContent = 'All prizes are out of stock.';
-		  return; // stop drawing wheel etc.
+			toggleSoldOutUI(true);
+			// Optionally also update any status text:
+			const log = document.getElementById('log');
+			if (log) log.textContent = 'All prizes are out of stock.';
+			return; // stop drawing wheel etc.
 		}
 		else
 		{
 			showForm();
 			toggleSoldOutUI(false);
 		}
-		
+
 		names = active.map((p) => String(p.name || "").trim()).filter(Boolean);
 		N = names.length;
 		slice = N ? (2 * Math.PI) / N : 0;
@@ -488,16 +524,20 @@
 	}
 
 	// --- Spin ---
-	function positiveMod(a, n) {
+	function positiveMod(a, n)
+	{
 		return ((a % n) + n) % n;
 	}
-	function easeOutCubic(t) {
+	function easeOutCubic(t)
+	{
 		return 1 - Math.pow(1 - t, 3);
 	}
 
-	function animateSpin(startDeg, endDeg, dur, done) {
+	function animateSpin(startDeg, endDeg, dur, done)
+	{
 		const t0 = performance.now();
-		function frame(now) {
+		function frame(now)
+		{
 			const t = Math.min(1, (now - t0) / dur);
 			const deg = startDeg + (endDeg - startDeg) * easeOutCubic(t);
 			setWheelRotation(deg);
@@ -510,10 +550,13 @@
 	const spinBtn = document.getElementById("spinBtn");
 	//const reloadBtn = document.getElementById("reloadBtn");
 
-	function decrementStockByName(name) {
+	function decrementStockByName(name)
+	{
 		const all = getLocalPrizes();
-		for (const p of all) {
-			if (String(p.name).trim() === name) {
+		for (const p of all)
+		{
+			if (String(p.name).trim() === name)
+			{
 				const s = Number(p.stock || 0);
 				if (s > 0) p.stock = s - 1;
 				break;
@@ -522,7 +565,8 @@
 		setLocalPrizes(all);
 	}
 
-	spinBtn.addEventListener("click", () => {
+	spinBtn.addEventListener("click", () =>
+	{
 		if (isSpinning || N === 0) return;
 		isSpinning = true;
 		spinBtn.disabled = true;
@@ -535,7 +579,8 @@
 		const align = positiveMod(-centerDeg - remainder, 360);
 		const extraTurns = 4;
 		const finalRot = currentRotation + extraTurns * 360 + align;
-		animateSpin(currentRotation, finalRot, 3000, () => {
+		animateSpin(currentRotation, finalRot, 3000, () =>
+		{
 			currentRotation = finalRot;
 			const name = names[chosen];
 			log.textContent = `Winner: ${name}`;
@@ -551,117 +596,126 @@
 	//reloadBtn.addEventListener("click", clearLocalPrizes);
 
 	// --- On-screen keyboard for ALL inputs ---
-	(function () {
-	  // Which inputs should use the keyboard?
-	  const inputs = document.querySelectorAll(
-		'#userForm input[type="text"], #userForm input[type="email"], #userForm input[type="search"], #userForm input[type="tel"], #userForm input:not([type])'
-	  );
-	
-	  const kb = document.getElementById("vkb");
-	  let active = null; // currently focused input
-	
-	  function showKB(forEl) {
-		if (!forEl || forEl.disabled || forEl.readOnly) return;
-		active = forEl;
-		kb.classList.add("show");
-		kb.setAttribute("aria-hidden", "false");
-		// keep caret where user tapped
-		active.focus();
-	  }
-	
-	  function hideKB() {
-		kb.classList.remove("show");
-		kb.setAttribute("aria-hidden", "true");
-		active = null;
-	  }
-	
-	  function insert(txt) {
-		if (!active) return;
-		const s = active.selectionStart ?? active.value.length;
-		const e = active.selectionEnd ?? s;
-		active.value = active.value.slice(0, s) + txt + active.value.slice(e);
-		const p = s + txt.length;
-		active.setSelectionRange(p, p);
-		active.dispatchEvent(new Event("input", { bubbles: true }));
-		active.focus();
-	  }
-	
-	  function backspace() {
-		if (!active) return;
-		const s = active.selectionStart ?? active.value.length;
-		const e = active.selectionEnd ?? s;
-		if (s !== e) {
-		  active.value = active.value.slice(0, s) + active.value.slice(e);
-		  active.setSelectionRange(s, s);
-		} else if (s > 0) {
-		  active.value = active.value.slice(0, s - 1) + active.value.slice(e);
-		  active.setSelectionRange(s - 1, s - 1);
+	(function ()
+	{
+		// Which inputs should use the keyboard?
+		const inputs = document.querySelectorAll(
+			'#userForm input[type="text"], #userForm input[type="email"], #userForm input[type="search"], #userForm input[type="tel"], #userForm input:not([type])'
+		);
+
+		const kb = document.getElementById("vkb");
+		let active = null; // currently focused input
+
+		function showKB(forEl)
+		{
+			if (!forEl || forEl.disabled || forEl.readOnly) return;
+			active = forEl;
+			kb.classList.add("show");
+			kb.setAttribute("aria-hidden", "false");
+			// keep caret where user tapped
+			active.focus();
 		}
-		active.dispatchEvent(new Event("input", { bubbles: true }));
-		active.focus();
-	  }
-	
-	  // Wire up all matching inputs
-	  inputs.forEach((el) => {
-		el.addEventListener("focus", () => showKB(el));
-		el.addEventListener("click", () => showKB(el));
-		// keep keyboard’s internal value in sync if user types (e.g., physical kb)
-		el.addEventListener("input", () => {
-		  // no-op here unless you mirror text onto keys; kept for completeness
+
+		function hideKB()
+		{
+			kb.classList.remove("show");
+			kb.setAttribute("aria-hidden", "true");
+			active = null;
+		}
+
+		function insert(txt)
+		{
+			if (!active) return;
+			const s = active.selectionStart ?? active.value.length;
+			const e = active.selectionEnd ?? s;
+			active.value = active.value.slice(0, s) + txt + active.value.slice(e);
+			const p = s + txt.length;
+			active.setSelectionRange(p, p);
+			active.dispatchEvent(new Event("input", { bubbles: true }));
+			active.focus();
+		}
+
+		function backspace()
+		{
+			if (!active) return;
+			const s = active.selectionStart ?? active.value.length;
+			const e = active.selectionEnd ?? s;
+			if (s !== e)
+			{
+				active.value = active.value.slice(0, s) + active.value.slice(e);
+				active.setSelectionRange(s, s);
+			} else if (s > 0)
+			{
+				active.value = active.value.slice(0, s - 1) + active.value.slice(e);
+				active.setSelectionRange(s - 1, s - 1);
+			}
+			active.dispatchEvent(new Event("input", { bubbles: true }));
+			active.focus();
+		}
+
+		// Wire up all matching inputs
+		inputs.forEach((el) =>
+		{
+			el.addEventListener("focus", () => showKB(el));
+			el.addEventListener("click", () => showKB(el));
+			// keep keyboard’s internal value in sync if user types (e.g., physical kb)
+			el.addEventListener("input", () =>
+			{
+				// no-op here unless you mirror text onto keys; kept for completeness
+			});
 		});
-	  });
-	
-	  // Keyboard button handling
-	  kb.addEventListener("pointerdown", (ev) => {
-		const t = ev.target.closest(".kb-key");
-		if (!t) return;
-		ev.preventDefault();
-		const a = t.getAttribute("data-action");
-		if (a === "back") return backspace();
-		if (a === "clear") {
-		  if (!active) return;
-		  active.value = "";
-		  active.dispatchEvent(new Event("input", { bubbles: true }));
-		  active.focus();
-		  return;
-		}
-		if (a === "done") return hideKB();
-		const ch = t.getAttribute("data-key");
-		if (ch != null) insert(ch);
-	  });
-	
-	  // Hide keyboard if clicking outside both an input and the keyboard
-	  document.addEventListener("pointerdown", (ev) => {
-		const target = ev.target;
-		const clickedAnInput = [...inputs].some((el) => el === target || el.contains(target));
-		if (!clickedAnInput && !kb.contains(target)) hideKB();
-	  });
-	
-	  // If the focused input disappears (e.g., form hidden), hide keyboard
-	  document.addEventListener("visibilitychange", () => {
-		if (document.hidden) hideKB();
-	  });
+
+		// Keyboard button handling
+		kb.addEventListener("pointerdown", (ev) =>
+		{
+			const t = ev.target.closest(".kb-key");
+			if (!t) return;
+			ev.preventDefault();
+			const a = t.getAttribute("data-action");
+			if (a === "back") return backspace();
+			if (a === "clear")
+			{
+				if (!active) return;
+				active.value = "";
+				active.dispatchEvent(new Event("input", { bubbles: true }));
+				active.focus();
+				return;
+			}
+			if (a === "done") return hideKB();
+			const ch = t.getAttribute("data-key");
+			if (ch != null) insert(ch);
+		});
+
+		// Hide keyboard if clicking outside both an input and the keyboard
+		document.addEventListener("pointerdown", (ev) =>
+		{
+			const target = ev.target;
+			const clickedAnInput = [...inputs].some((el) => el === target || el.contains(target));
+			if (!clickedAnInput && !kb.contains(target)) hideKB();
+		});
+
+		// If the focused input disappears (e.g., form hidden), hide keyboard
+		document.addEventListener("visibilitychange", () =>
+		{
+			if (document.hidden) hideKB();
+		});
 	})();
 
 	// --- Init ---
-	mountPageBackground();
+	//mountPageBackground();
 	//adjustPageHeightForBg();
 	//window.addEventListener("resize", adjustPageHeightForBg);
 	//window.addEventListener("orientationchange", adjustPageHeightForBg);
 	loadData();
 
-	function mountStand() {
+	/*function mountStand() {
 	  const wrap  = document.getElementById("wrap");
 	  const wheel = document.getElementById("wheelSvg");
 	  const layer = document.getElementById("standLayer");
 	  if (!wrap || !wheel || !layer || !window.STAND_VIEWBOX || !window.STAND_BODY) return;
 	
 	  // layer styling
-	  layer.style.position = "absolute";
-	  layer.style.pointerEvents = "none";
-	  layer.style.zIndex = "-1";
-	  layer.style.overflow = "visible";
-	
+
 	  const wrapRect  = wrap.getBoundingClientRect();
 	  const wheelRect = wheel.getBoundingClientRect();
 	
@@ -738,18 +792,22 @@
 	
 	// call once during init
 	setupStandMount();
+	*/
 
 })();
 
 
 
 // Move Reload + Open config to bottom-left container without breaking behavior
-(function () {
-	function moveControls() {
+(function ()
+{
+	function moveControls()
+	{
 		//var reload = document.getElementById("reloadBtn");
 		var config = document.querySelector('a[href="config.html"]');
 		var ctl = document.getElementById("bottomControls");
-		if (!ctl) {
+		if (!ctl)
+		{
 			ctl = document.createElement("div");
 			ctl.id = "bottomControls";
 			document.body.appendChild(ctl);
@@ -761,19 +819,24 @@
 })();
 
 // Ensure pressed visual on touch & keyboard
-(function () {
+(function ()
+{
 	var btn = document.getElementById("spinBtn");
 	if (!btn) return;
-	var press = function () {
+	var press = function ()
+	{
 		btn.classList.add("is-pressed");
 	};
-	var release = function () {
+	var release = function ()
+	{
 		btn.classList.remove("is-pressed");
 	};
 	btn.addEventListener("pointerdown", press, { passive: true });
 	window.addEventListener("pointerup", release, { passive: true });
-	btn.addEventListener("keydown", function (e) {
-		if (e.key === " " || e.key === "Enter") {
+	btn.addEventListener("keydown", function (e)
+	{
+		if (e.key === " " || e.key === "Enter")
+		{
 			press();
 		}
 	});
@@ -782,8 +845,11 @@
 })();
 
 /* Bottom base highlight on the stand (lighter blue rounded rectangle, thinner) */
-(function () {
-	function addBaseRect() {
+/*
+(function ()
+{
+	function addBaseRect()
+	{
 		var layer = document.getElementById("standLayer");
 		if (!layer) return;
 
@@ -832,15 +898,19 @@
 	window.addEventListener("load", addBaseRect);
 	window.addEventListener("resize", addBaseRect);
 })();
+*/
+
 
 // Lightweight, seamless-loop confetti (top -> bottom), various sizes
-(function () {
+(function ()
+{
 	const canvas = document.getElementById("confettiCanvas");
 	if (!canvas) return;
 	const ctx = canvas.getContext("2d");
 
 	let DPR = Math.min(2, window.devicePixelRatio || 1);
-	function resize() {
+	function resize()
+	{
 		const w = window.innerWidth;
 		const h = window.innerHeight;
 		canvas.style.width = w + "px";
@@ -848,7 +918,8 @@
 		canvas.width = Math.floor(w * DPR);
 		canvas.height = Math.floor(h * DPR);
 	}
-	window.addEventListener("resize", () => {
+	window.addEventListener("resize", () =>
+	{
 		DPR = Math.min(2, window.devicePixelRatio || 1);
 		resize();
 	});
@@ -861,14 +932,17 @@
 	); // density
 	const particles = [];
 
-	function rand(min, max) {
+	function rand(min, max)
+	{
 		return Math.random() * (max - min) + min;
 	}
-	function pick(arr) {
+	function pick(arr)
+	{
 		return arr[(Math.random() * arr.length) | 0];
 	}
 
-	function spawnOne(x) {
+	function spawnOne(x)
+	{
 		const sizeType = Math.random();
 		const w =
 			sizeType < 0.65
@@ -898,7 +972,8 @@
 	const FILL_TIME = 4; // used only for replenishing after resizes
 	const SPAWN_RATE = MAX / FILL_TIME; // particles per second when refilling
 	const hCSS0 = canvas.height / DPR;
-	for (let i = 0; i < MAX; i++) {
+	for (let i = 0; i < MAX; i++)
+	{
 		const p = spawnOne();
 		p.y = (Math.random() * 2 - 1) * hCSS0; // scatter full-screen vertically
 		p.x += Math.random() * 60 - 30;
@@ -907,7 +982,8 @@
 		particles.push(p);
 	}
 	let last = performance.now();
-	function frame(now) {
+	function frame(now)
+	{
 		const dt = Math.min(0.033, (now - last) / 1000); // seconds (cap at ~30fps step)
 		last = now;
 
@@ -918,7 +994,8 @@
 
 		ctx.clearRect(0, 0, W, H);
 
-		for (let i = 0; i < particles.length; i++) {
+		for (let i = 0; i < particles.length; i++)
+		{
 			const p = particles[i];
 			// physics
 			p.vy += 30 * dt; // gentle "gravity" px/s^2
@@ -928,7 +1005,8 @@
 			p.ang += p.spin * dt;
 
 			// recycle when off-screen
-			if (p.y - p.h > hCSS) {
+			if (p.y - p.h > hCSS)
+			{
 				// respawn at top with fresh params
 				particles[i] = spawnOne();
 				continue;
@@ -950,7 +1028,8 @@
 
 		// keep population up with staggered spawns (avoid waves)
 		spawnAcc += SPAWN_RATE * dt;
-		while (particles.length < MAX && spawnAcc >= 1) {
+		while (particles.length < MAX && spawnAcc >= 1)
+		{
 			particles.push(spawnOne());
 			spawnAcc -= 1 + Math.random() * 0.75; // jitter
 		}
@@ -961,25 +1040,29 @@
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  const termsLink = document.getElementById('termsLink');   // your checkbox
-  const modal    = document.getElementById('termsModal');
-  const closeBtn = document.getElementById('closeTerms');
+document.addEventListener('DOMContentLoaded', () =>
+{
+	const termsLink = document.getElementById('termsLink');   // your checkbox
+	const modal = document.getElementById('termsModal');
+	const closeBtn = document.getElementById('closeTerms');
 
-  // Show modal when checkbox is clicked
-  termsLink.addEventListener('click', () => {
-	modal.style.display = 'flex';
-  });
+	// Show modal when checkbox is clicked
+	termsLink.addEventListener('click', () =>
+	{
+		modal.style.display = 'flex';
+	});
 
-  // Close modal on back arrow
-  closeBtn.addEventListener('click', () => {
-	modal.style.display = 'none';
-  });
+	// Close modal on back arrow
+	closeBtn.addEventListener('click', () =>
+	{
+		modal.style.display = 'none';
+	});
 
-  // Close if user taps outside the card
-  modal.addEventListener('click', (e) => {
-	if (e.target === modal) modal.style.display = 'none';
-  });
+	// Close if user taps outside the card
+	modal.addEventListener('click', (e) =>
+	{
+		if (e.target === modal) modal.style.display = 'none';
+	});
 });
 
 
