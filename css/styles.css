@@ -1,152 +1,338 @@
-html,
-body {
-	height: 100%;
+/* ------------------------------------
+Font Sizes
+------------------------------------ */
+
+:root
+{
+	/* Core font sizes */
+	--fs-body: clamp(18px, 1.3vmin, 32px);
+	/* labels/instructions */
+	--fs-input: clamp(20px, 1.6vmin, 36px);
+	/* typed text in fields */
+	--fs-button: clamp(22px, 1.7vmin, 40px);
+	/* button text */
+	--fs-h1: clamp(36px, 2.6vmin, 72px);
+	/* main title */
+	--fs-h2: clamp(28px, 16vmin, 60px);
+	/* section headings */
+	--fs-h3: clamp(24px, 8vmin, 48px);
+
+	/* Line heights */
+	--lh-body: 1.4;
+	--lh-heading: 1;
+
+	/* Touch target + spacing */
+	--touch-target: clamp(48px, 3vmin, 80px);
+	/* minimum 48px per a11y */
+	--space-1: clamp(8px, 0.6vmin, 16px);
+	--space-2: clamp(12px, 0.9vmin, 24px);
+	--space-3: clamp(16px, 1.2vmin, 32px);
+	--space-4: clamp(20px, 1.6vmin, 40px);
 }
 
-* {
+html
+{
+	/* Use a fluid base so rems track the screen nicely */
+	font-size: var(--fs-body);
+}
+
+
+body
+{
+	line-height: var(--lh-body);
+}
+
+/* Headings */
+h1,
+.h1
+{
+	font-size: calc(var(--fs-h1) / 1rem * 1rem);
+	line-height: var(--lh-heading);
+	margin: 0 0 var(--space-3);
+}
+
+h2,
+.h2
+{
+	font-size: calc(var(--fs-h2) / 1rem * 1rem);
+	line-height: var(--lh-heading);
+	margin: var(--space-4) 0 var(--space-2);
+}
+
+h3,
+.h3
+{
+	font-size: calc(var(--fs-h3) / 1rem * 1rem);
+	line-height: var(--lh-heading);
+	margin: var(--space-3) 0 var(--space-2);
+}
+
+/* Form layout */
+.form
+{
+	max-width: min(1200px, 92vw);
+	margin: 0 auto;
+	padding: var(--space-4);
+}
+
+
+label
+{
+	font-size: 1rem;
+	/* uses --fs-body via html base */
+}
+
+/* Inputs */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+select,
+textarea
+{
+	font-size: calc(var(--fs-input) / 1rem * 1rem);
+	line-height: 1.3;
+	min-height: var(--touch-target);
+}
+
+textarea
+{
+	min-height: calc(var(--touch-target) * 2);
+}
+
+/* Buttons */
+button,
+.input-button,
+.button
+{
+	font-size: calc(var(--fs-button) / 1rem * 1rem);
+	min-height: var(--touch-target);
+	padding: 0 var(--space-3);
+}
+
+button:focus-visible,
+.input-button:focus-visible,
+.button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible
+{}
+
+/* Helper: bigger hit area for small controls (if any) */
+.input--tap-target
+{
+	min-height: var(--touch-target);
+}
+
+/* Portrait 4K kiosks often have lots of vertical space.
+   If you prefer slightly larger vertical rhythm, bump spacing in tall viewports. */
+@media (min-height: 1600px)
+{
+	:root
+	{
+		--space-1: clamp(10px, 0.7vmin, 18px);
+		--space-2: clamp(14px, 1.0vmin, 28px);
+		--space-3: clamp(18px, 1.3vmin, 36px);
+		--space-4: clamp(24px, 1.8vmin, 48px);
+	}
+}
+
+
+
+
+/* ------------------------------------
+HTML
+------------------------------------ */
+
+html,
+body
+{
+	margin: 0;
+	padding: 0;
+	padding-top: 200px;
+}
+
+*
+{
 	box-sizing: border-box;
 }
 
-body {
+body
+{
 	font-family: Arial, sans-serif;
-	margin: 0;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
 	background: #fff;
 }
+
 /* Inline page background SVG sits behind everything */
-#pageBg {
+#pageBg
+{
 	position: fixed;
 	inset: 0;
-	width: 100vw; /* fill width */
-	height: auto; /* let height grow with width */
-	z-index: 0;
-	pointer-events: none;
-	display: block;
-}
-/* App content overlays the background */
-#app {
-	position: relative;
-	z-index: 1;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 12px;
-	padding: 16px;
 	width: 100%;
 	height: 100%;
+	object-fit: cover;
+	z-index: 0;
+	pointer-events: none;
 }
+
+
 /* Keep wheel sizing/layout as before */
-#wrap {
-	transform: scale(2);
-	transform-origin: top center;
+
+#wheelWrap
+{
 	position: relative;
-	width: 90vw;
-	height: calc(90vw + 220px);
-	max-width: 800px;
+	width: 70%;
+	margin-left: 50%;
+	transform: translateX(-50%);
+	text-align: center;
+	z-index: 10;
+}
+
+/* Place TAP TO SPIN above the wheel */
+#spinBtn
+{
+	/* overrides earlier translateX only */
+	z-index: 12;
+	pointer-events: auto;
+	font-weight: 700;
+	padding: 0.9em 1.6em !important;
+	border-radius: 14px !important;
+	/* overrides earlier 12px */
+	background: #ee752a !important;
+	color: #ffffff !important;
+	border: 3px solid #ffffff !important;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+/* Darken on click/press */
+#spinBtn:active,
+#spinBtn.is-pressed
+{
+	padding: 0.9em 1.6em !important;
+	transform-origin: center !important;
+	background: #d4621f !important;
+	/* darker orange */
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+#wheelSvg
+{
+	margin-top: 150px;
 	overflow: visible;
-	border-radius: 12px;
-	margin-top: 20px;
+	z-index: 5;
+	position: relative;
 }
-#wheelSvg {
-	width: 100%;
-	height: auto;
-	display: block;
-}
+
 #standLayer
 {
-	left: 50%;
-	top: 350px; 
-	transform: translateX(-50%);
-}
-.row {
-	display: flex;
-	gap: 8px;
-	align-items: center;
-	margin-top: 8px;
+	margin-top: -50%;
+	z-index: 2;
+	position: relative;
 }
 
+#stand-img
+{
+	position: relative;
+	z-index: 5;
+}
 
+#podium-img
+{
+	position: relative;
+	z-index: 3;
+	margin-top: -100px;
+}
 
 
 
 
 
 /* Full-screen congrats overlay (hidden by default) */
-#congratsMsg {
-  position: fixed;            /* cover whole screen */
-  inset: 0;
-  display: grid;
-  place-items: center;
-  z-index: 1000;
+#congratsMsg
+{
+	position: fixed;
+	/* cover whole screen */
+	inset: 0;
+	display: grid;
+	place-items: center;
+	z-index: 1000;
 
-  opacity: 0;
-  pointer-events: none;       /* clicks pass through when hidden */
-  transition: opacity 250ms ease;
+	opacity: 0;
+	pointer-events: none;
+	/* clicks pass through when hidden */
+	transition: opacity 250ms ease;
 }
 
 /* Show state you can toggle from JS */
-#congratsMsg.show {
-  opacity: 1;
-  pointer-events: auto;
+#congratsMsg.show
+{
+	opacity: 1;
+	pointer-events: auto;
 }
 
 /* Background video fills screen behind the card */
-#congratsMsg .bg-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;          /* crop to fill */
-  object-position: center;
-  z-index: -1;                /* behind the card */
-  filter: brightness(0.85);   /* subtle dim so text pops */
+#congratsMsg .bg-video
+{
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	/* crop to fill */
+	object-position: center;
+	z-index: -1;
+	/* behind the card */
+	filter: brightness(0.85);
+	/* subtle dim so text pops */
 }
 
 /* Optional dark scrim over video for contrast */
-#congratsMsg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-	to bottom,
-	rgba(0, 0, 0, 0) 0%,    /* fully transparent at top */
-	rgba(0, 0, 0, 0.9) 60%
-  );
-  z-index: 3;
+#congratsMsg::before
+{
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to bottom,
+			rgba(0, 0, 0, 0) 0%,
+			/* fully transparent at top */
+			rgba(0, 0, 0, 0.9) 60%);
+	z-index: 3;
 }
 
 /* Center card */
-#congratsMsg .card {
-  padding: 28px 36px;
-  text-align: center;
-  z-index: 5;
+#congratsMsg .card
+{
+	padding: 28px 36px;
+	text-align: center;
+	z-index: 5;
 }
 
 /* Optional image at the top of the card */
-#congratsMsg .card img.prize-img {
-  display: block;
-  width: 90%;
-  max-width: 800px;
-  height: auto;
-  margin: 0 auto 12px;
+#congratsMsg .card img.prize-img
+{
+	display: block;
+	width: 90%;
+	max-width: 1200px;
+	height: auto;
+	margin: 0 auto 12px;
 }
 
-#congratsMsg h2, #congratsMsg h3, #congratsMsg #congratsPrize {
-  margin: 0 0 10px;
-  font-size: 5rem;
-  line-height: 1.2;
-  color: #ffffff;
-}
-#congratsMsg h3 {
-	font-size: 4rem;
-}
-#congratsMsg #congratsPrize {
-	font-size: 3rem;
+#congratsMsg h2,
+#congratsMsg h3,
+#congratsMsg #congratsPrize
+{
+	margin: 0 0 10px;
+	color: #ffffff;
 }
 
+#congratsMsg h3
+{}
+
+#congratsMsg #congratsPrize
+{}
 
 
 
@@ -159,20 +345,28 @@ body {
 
 
 
-.keyboard {
-	width: min(90vw, 800px);
+
+.keyboard
+{
+	width: min(1200px, 92vw);
 	display: none;
 	z-index: 999999;
 }
-.keyboard.show {
+
+.keyboard.show
+{
 	display: block;
 }
-.kb-row {
+
+.kb-row
+{
 	display: flex;
 	gap: 6px;
 	margin-top: 6px;
 }
-.kb-key {
+
+.kb-key
+{
 	flex: 1;
 	padding: 14px;
 	font-size: 18px;
@@ -181,13 +375,19 @@ body {
 	background: #f5f5f5;
 	user-select: none;
 }
-.kb-key:active {
+
+.kb-key:active
+{
 	background: #e3e3e3;
 }
-.kb-key.wide {
+
+.kb-key.wide
+{
 	flex: 2;
 }
-.kb-key.space {
+
+.kb-key.space
+{
 	flex: 5;
 }
 
@@ -200,7 +400,8 @@ body {
 /* Hide typing UI (kept for later use) */
 
 /* Bottom-left controls container */
-#bottomControls {
+#bottomControls
+{
 	position: fixed;
 	bottom: 16px;
 	left: 16px;
@@ -209,95 +410,62 @@ body {
 	z-index: 5;
 }
 
-/* Bigger, front-most Spin button */
-#spinBtn {
-	transform-origin: center !important;
-	transform: translateX(-50%) scale(1.6) !important;
-	left: 50%;
-	top: 260px !important;
-	position: absolute !important;
-	z-index: 12; /* above any overlays */
-	pointer-events: auto; /* ensure clickable */
-	font-size: 1.6em !important;
-	font-weight: 700;
-	padding: 0.9em 1.6em !important;
-	border-radius: 12px;
-}
 
-/* TAP TO SPIN button styling */
-#spinBtn {
-	background: #ee752a !important; /* orange */
-	color: #ffffff !important; /* white text */
-	border: 3px solid #ffffff !important; /* white stroke outline */
-	border-radius: 14px !important;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-	letter-spacing: 1px;
-	text-transform: uppercase;
-}
-
-/* Darken on click/press */
-#spinBtn:active,
-#spinBtn.is-pressed {
-	padding: 0.9em 1.6em !important;
-	font-size: 1.6em !important;
-	transform-origin: center !important;
-	background: #d4621f !important; /* darker orange */
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-	transform: translateX(-50%) scale(1.6) !important;
-}
 
 /* Top-centered brand logo */
-#brandLogo {
+#brandLogo
+{
 	position: fixed;
 	top: 15px;
 	left: 50%;
 	transform: translateX(calc(-50% + 2px));
-	z-index: 6; /* above overlays, below modals if any */
-	pointer-events: none; /* don't block clicks */
+	z-index: 6;
+	/* above overlays, below modals if any */
+	pointer-events: none;
+	/* don't block clicks */
 }
-#brandLogo svg {
-	width: 600px; /* tweak size here */
+
+#brandLogo svg
+{
+	width: 600px;
+	/* tweak size here */
 	height: auto;
 	display: block;
 }
 
 /* Top gradient backdrop behind the logo (non-interactive) */
-#brandTopGradient {
+#brandTopGradient
+{
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 160px; /* adjust if needed */
-	background: linear-gradient(
-		to bottom,
-		rgba(0, 0, 0, 0.6),
-		rgba(0, 0, 0, 0)
-	);
-	z-index: 5; /* just below #brandLogo (z = 6) */
-	pointer-events: none; /* don't block clicks */
-}
-
-/* Place TAP TO SPIN above the wheel */
-#spinBtn {
-	position: absolute !important;
-	top: 10px; /* above the wheel inside #wrap */
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 12; /* above stand/wheel overlays */
-	pointer-events: auto;
+	height: 160px;
+	/* adjust if needed */
+	background: linear-gradient(to bottom,
+			rgba(0, 0, 0, 0.6),
+			rgba(0, 0, 0, 0));
+	z-index: 5;
+	/* just below #brandLogo (z = 6) */
+	pointer-events: none;
+	/* don't block clicks */
 }
 
 /* Fullscreen confetti canvas */
-#confettiCanvas {
+#confettiCanvas
+{
 	position: fixed;
 	inset: 0;
 	width: 100vw;
 	height: 100vh;
-	z-index: 4; /* below top gradient (5) and logo/button (6+/12), above background */
-	pointer-events: none; /* never block clicks */
+	z-index: 4;
+	/* below top gradient (5) and logo/button (6+/12), above background */
+	pointer-events: none;
+	/* never block clicks */
 }
 
-.fade {
+.fade
+{
 	opacity: 0;
 	visibility: hidden;
 
@@ -305,21 +473,24 @@ body {
 	display: none;
 }
 
-.fade.show {
+.fade.show
+{
 	opacity: 1;
 	visibility: visible;
 	height: auto;
-	display: block;	transition:
-	opacity 0.5s ease,
-	visibility 0.5s ease;
+	display: block;
+	transition:
+		opacity 0.5s ease,
+		visibility 0.5s ease;
 }
 
 /* FORM */
 
 /* ======= Card / panel ======= */
-#userFormWrap {
-	width: min(480px, calc(100vw - 48px));
-	margin: 235px auto 40px auto;
+#userFormWrap
+{
+	width: min(1200px, 92vw);
+	margin: 0 auto 0 auto;
 	padding: 28px 32px 26px;
 	border-radius: 24px;
 	color: #fff;
@@ -336,10 +507,12 @@ body {
 		Roboto,
 		Arial,
 		sans-serif;
+	z-index: 10;
 }
 
 /* inner glow rim */
-#userFormWrap::after {
+#userFormWrap::after
+{
 	content: "";
 	position: absolute;
 	inset: 10px;
@@ -351,36 +524,40 @@ body {
 }
 
 /* big heading like screenshot */
-#userFormWrap::before {
+#userFormWrap::before
+{
 	content: "ENTER AND WIN!";
 	display: block;
 	margin: 4px 0 18px;
 	font-weight: 800;
-	font-size: clamp(28px, 5.2vw, 44px);
-	line-height: 1.05;
-	letter-spacing: 0.02em;
 	text-transform: uppercase;
 	text-align: left;
 	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 /* ======= Form base ======= */
-#userForm a {
+#userForm a
+{
 	color: #ffffff;
 }
 
 /* hide the tiny “Name:”/“Company:”/“Email:” captions */
 #userForm label:has(> input[type="text"]),
-#userForm label:has(> input[type="email"]) {
-	font-size: 0; /* hide the label text but keep layout */
+#userForm label:has(> input[type="email"])
+{
+	font-size: 0;
+	/* hide the label text but keep layout */
 }
-#userForm label > br {
+
+#userForm label > br
+{
 	display: none;
 }
 
 /* text inputs: chunky rounded, white fill */
 #userForm input[type="text"],
-#userForm input[type="email"] {
+#userForm input[type="email"]
+{
 	width: 100%;
 	height: 48px;
 	margin: 14px 0;
@@ -389,18 +566,21 @@ body {
 	border-radius: 15px;
 	background: #fff;
 	color: #13324e;
-	font-size: 18px;
 	font-weight: 600;
 	outline: none;
 	box-shadow:
 		inset 0 -2px 0 rgba(0, 0, 0, 0.04),
 		0 1px 0 rgba(255, 255, 255, 0.55);
 }
-#userForm input::placeholder {
+
+#userForm input::placeholder
+{
 	color: #9db3c7;
 	font-weight: 500;
 }
-#userForm input:focus {
+
+#userForm input:focus
+{
 	box-shadow:
 		0 0 0 3px rgba(255, 255, 255, 0.85),
 		0 0 0 6px rgba(14, 133, 203, 0.55),
@@ -408,28 +588,33 @@ body {
 }
 
 /* checkboxes inline like the mock */
-#userForm label:has(> input[type="checkbox"]) {
+#userForm label:has(> input[type="checkbox"])
+{
 	display: inline;
 	align-items: center;
 	gap: 8px;
 	margin: 6px 14px 0 0;
-	font-size: 15px;
 	font-weight: 700;
 	letter-spacing: 0.01em;
 	color: #fff;
 	vertical-align: sub;
 }
-#userForm input[type="checkbox"] {
+
+#userForm input[type="checkbox"]
+{
 	width: 22px;
 	height: 22px;
-	accent-color: #1ea7e6; /* modern browsers */
+	accent-color: #1ea7e6;
+	/* modern browsers */
 	border-radius: 6px;
 	vertical-align: sub;
 }
 
 /* submit button: pill, grey/blue */
-#userForm button[type="submit"] {
-	float: right; /* position at right like screenshot */
+#userForm button[type="submit"]
+{
+	float: right;
+	/* position at right like screenshot */
 	margin-top: 6px;
 	padding: 10px 20px 8px 20px;
 	border: 0;
@@ -437,7 +622,6 @@ body {
 	border: 1px solid #ffffff;
 	background: #86CDDD;
 	color: #fff;
-	font-size: 16px;
 	font-weight: 800;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
@@ -446,35 +630,43 @@ body {
 		transform 0.05s ease,
 		filter 0.15s ease;
 }
-#userForm button[type="submit"]:hover {
+
+#userForm button[type="submit"]:hover
+{
 	filter: brightness(1.04);
 }
-#userForm button[type="submit"]:active {
+
+#userForm button[type="submit"]:active
+{
 	transform: translateY(1px);
 }
 
 /* clearfix for the float */
-#userForm::after {
+#userForm::after
+{
 	content: "";
 	display: block;
 	clear: both;
 }
 
 /* responsive tweaks */
-@media (max-width: 520px) {
-	#userFormWrap {
+@media (max-width: 520px)
+{
+	#userFormWrap
+	{
 		padding: 22px 18px 20px;
 		border-radius: 20px;
 	}
+
 	#userForm input[type="text"],
-	#userForm input[type="email"] {
-		height: 52px;
-		font-size: 16px;
-	}
-	#userForm label:has(> input[type="checkbox"]) {
-		font-size: 14px;
-	}
-	#userForm button[type="submit"] {
+	#userForm input[type="email"]
+	{}
+
+	#userForm label:has(> input[type="checkbox"])
+	{}
+
+	#userForm button[type="submit"]
+	{
 		float: none;
 		width: 100%;
 		margin-top: 12px;
@@ -484,37 +676,42 @@ body {
 
 
 /* Overlay backdrop */
-.modal {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 10000;
-  justify-content: center; align-items: center;
+.modal
+{
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+	z-index: 10000;
+	justify-content: center;
+	align-items: center;
 }
 
 /* Card styling, similar to form but white with border */
-#termsCard {
-  background: #fff;
-  color: #111;
-  width: min(92vw, 450px);
-  padding: 28px 32px 32px;
-  border-radius: 24px;
-  border: 2px solid #86CDDD;
-  box-shadow: 0 18px 26px rgba(0,0,0,.35);
-  position: relative;
-  font-family: system-ui, Arial, sans-serif;
-  text-align: left;
+#termsCard
+{
+	background: #fff;
+	color: #111;
+	width: min(90px, 92vw);
+	padding: 50px;
+	border-radius: 24px;
+	border: 2px solid #86CDDD;
+	box-shadow: 0 18px 26px rgba(0, 0, 0, .35);
+	position: relative;
+	font-family: system-ui, Arial, sans-serif;
+	text-align: left;
 }
 
-#termsCard h2 {
-  color: #009688;
-  font-weight: 400;
-  font-size: 1.6em;
-  margin: 0 0 18px 30px;
+#termsCard h2
+{
+	color: #009688;
+	font-weight: 400;
+	margin: 0 0 18px 30px;
 }
 
 /* Back arrow */
-.back-btn {
+.back-btn
+{
 	position: absolute;
 	top: 35px;
 	left: 35px;
@@ -531,17 +728,28 @@ body {
 
 
 /* Text and lists */
-#termsCard ul {
-  margin: 0 0 16px 1.2em;
-  padding: 0;
-  list-style: disc;
+#termsCard ul
+{
+	margin: 0 0 16px 1.2em;
+	padding: 0;
+	list-style: disc;
 }
-#termsCard p { margin: 0 0 14px; }
-#termsCard .qr-hint { color: #ee752a; font-weight: 600; }
+
+#termsCard p
+{
+	margin: 0 0 14px;
+}
+
+#termsCard .qr-hint
+{
+	color: #ee752a;
+	font-weight: 600;
+}
 
 /* QR image */
-.qr-code {
-  max-width: 140px;
-  display: block;
-  margin: 12px auto 0;
+.qr-code
+{
+	max-width: 140px;
+	display: block;
+	margin: 12px auto 0;
 }
