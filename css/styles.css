@@ -108,8 +108,6 @@ button,
 .button
 {
 	font-size: calc(var(--fs-button) / 1rem * 1rem);
-	min-height: var(--touch-target);
-	padding: 0 var(--space-3);
 }
 
 button:focus-visible,
@@ -684,7 +682,7 @@ body
 {
 	background: #fff;
 	color: #111;
-	width: min(90px, 92vw);
+	width: min(900px, 92vw);
 	padding: 50px;
 	border-radius: 24px;
 	border: 2px solid #86CDDD;
@@ -705,10 +703,10 @@ body
 .back-btn
 {
 	position: absolute;
-	top: 35px;
+	top: 82px;
 	left: 35px;
-	width: 20px;
-	height: 20px;
+	width: 30px;
+	height: 30px;
 	background: none;
 	border: none;
 	cursor: pointer;
