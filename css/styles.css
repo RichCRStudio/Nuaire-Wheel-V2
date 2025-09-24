@@ -5,7 +5,7 @@ Fonts
 @font-face
 {
 	font-family: 'ProximaNova';
-	src: url('fonts/PROXIMANOVA_REGULAR.TTF') format('truetype');
+	src: url('../fonts/PROXIMANOVA_REGULAR.TTF') format('truetype');
 	font-weight: 400;
 	/* normal */
 	font-style: normal;
@@ -14,9 +14,18 @@ Fonts
 @font-face
 {
 	font-family: 'ProximaNova';
-	src: url('fonts/PROXIMANOVA_BOLD.OTF') format('opentype');
+	src: url('../fonts/PROXIMANOVA_BOLD.OTF') format('opentype');
 	font-weight: 700;
 	/* bold */
+	font-style: normal;
+}
+
+@font-face
+{
+	font-family: 'ProximaNova';
+	src: url('../fonts/PROXIMANOVA_BLACK.TTF') format('truetype');
+	font-weight: 900;
+	/* normal */
 	font-style: normal;
 }
 
@@ -215,17 +224,58 @@ body
 	z-index: 10;
 }
 
+#wheelGroup path
+{
+	background: linear-gradient(to bottom,
+			#009FDF 0%,
+			/* top edge */
+			#86cedd 40%,
+			/* lighter colour pulled toward the middle */
+			#86cedd 60%,
+			/* keeps centre light */
+			#009FDF 100%
+			/* bottom edge */
+		);
+}
+
+
+#wheelGroup foreignObject
+{
+	width: 150px;
+	height: 60px;
+}
+
+#wheelGroup foreignObject div
+{
+	font-family: 'ProximaNova', sans-serif;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	word-wrap: break-word;
+	/* legacy */
+	overflow-wrap: break-word;
+	/* modern */
+	font-size: 30px;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+}
+
 /* Place TAP TO SPIN above the wheel */
 #spinBtn
 {
+	font-family: 'ProximaNova', sans-serif;
 	z-index: 12;
 	pointer-events: auto;
 	font-weight: 700;
 
 	/* doubled font size + padding */
-	font-size: 4em;
+	font-size: 150px;
 	/* add this */
-	padding: .5em 2em !important;
+	padding: .3em .6em !important;
 
 	border-radius: 28px !important;
 	/* scale radius to match */
@@ -238,7 +288,7 @@ body
 	letter-spacing: 1px;
 	text-transform: uppercase;
 
-	margin-top: 400px;
+	margin-top: 200px;
 }
 
 /* Darken on click/press */
@@ -252,7 +302,7 @@ body
 
 #wheelSvg
 {
-	margin-top: 150px;
+	margin-top: 200px;
 	overflow: visible;
 	z-index: 5;
 	position: relative;
@@ -260,9 +310,11 @@ body
 
 #standLayer
 {
-	margin-top: -50%;
 	z-index: 2;
 	position: relative;
+	width: 60%;
+	margin: auto;
+	margin-top: -47%;
 }
 
 #stand-img
@@ -448,22 +500,20 @@ body
 /* Top-centered brand logo */
 #brandLogo
 {
-	position: fixed;
-	top: 15px;
-	left: 50%;
-	transform: translateX(calc(-50% + 2px));
+	width: 100%;
+	position: relative;
+	margin-left: 50%;
+	margin-top: 20px;
+	transform: translateX(-50%);
 	z-index: 6;
-	/* above overlays, below modals if any */
 	pointer-events: none;
-	/* don't block clicks */
+	text-align: center;
 }
 
-#brandLogo svg
+#brandLogo img
 {
-	width: 600px;
-	/* tweak size here */
-	height: auto;
-	display: block;
+	width: 100%;
+	max-width: 600px;
 }
 
 /* Top gradient backdrop behind the logo (non-interactive) */
@@ -698,47 +748,40 @@ body
 }
 
 /* Card styling, similar to form but white with border */
+
 #termsCard
 {
+	font-family: 'ProximaNova', sans-serif;
+	font-size: 45px;
 	background: #fff;
 	color: #111;
-	width: min(900px, 92vw);
+	width: min(1200px, 92vw);
 	padding: 100px;
-	border-radius: 24px;
-	border: 2px solid #86CDDD;
+	border-radius: 55px;
+	border: 2px solid #00A38E;
 	box-shadow: 0 18px 26px rgba(0, 0, 0, .35);
 	position: relative;
 	font-family: system-ui, Arial, sans-serif;
 	text-align: left;
+	padding: 28px;
+}
+
+#termsCardInner
+{
+	border: 3px solid #00A38E;
+	padding: 82px;
+	border-radius: 40px;
 }
 
 #termsCard h2,
 #termsCard h3
 {
+	font-size: 80px;
 	color: #009688;
 	font-weight: 400;
-	margin: 0 0 18px 0px;
+	margin: 0 0 113px 40px;
 	position: relative;
 }
-
-/* Back arrow */
-.back-btn
-{
-	position: absolute;
-	top: 50%;
-	left: -70px;
-	width: 40px;
-	height: 40px;
-	background: none;
-	border: none;
-	cursor: pointer;
-	border-left: 3px solid #9CA4AC;
-	border-bottom: 3px solid #9CA4AC;
-	transform: rotate(45deg) translateY(-50%);
-	margin-right: 10px;
-}
-
-
 
 /* Text and lists */
 #termsCard ul
@@ -755,6 +798,7 @@ body
 
 #termsCard .qr-hint
 {
+	font-size: 50px;
 	color: #ee752a;
 	font-weight: 600;
 }
@@ -762,7 +806,32 @@ body
 /* QR image */
 .qr-code
 {
-	max-width: 400px;
+	max-height: 410px;
+	max-width: 410px;
 	display: block;
 	margin: 50px auto 0 auto;
+}
+
+/* Back arrow */
+:root
+{
+	--arrow-diagonal: 110px;
+}
+
+.back-btn
+{
+	position: absolute;
+	top: 40px;
+	left: -90px;
+	width: calc(var(--arrow-diagonal) / 1.41421356 - 2.5px);
+	/* 2.5px is half border */
+	height: calc(var(--arrow-diagonal) / 1.41421356 - 2.5px);
+	/* 2.5px is half border */
+	background: none;
+	border: none;
+	cursor: pointer;
+	border-left: 5px solid #9CA4AC;
+	border-bottom: 5px solid #9CA4AC;
+	transform: rotate(45deg) translateY(-50%);
+	margin-right: 10px;
 }

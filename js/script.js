@@ -206,7 +206,7 @@
 		}
 	}*/
 
-	function mountPageBackground()
+	/*function mountPageBackground()
 	{
 		const bg = document.getElementById("pageBg");
 		if (!bg) return;
@@ -215,162 +215,185 @@
 			`${BG_VIEWBOX.minX} ${BG_VIEWBOX.minY} ${BG_VIEWBOX.width} ${BG_VIEWBOX.height}`,
 		);
 		bg.innerHTML = (BG_DEFS || "") + (BG_BODY || "");
-	}
+	}*/
 
 	// --- Static (non-rotating) center logo ---
-	function placeStaticLogo(hubR)
+	function placeStaticLogo(centerRimRadius)
 	{
-		// mount defs under root for safety
-		let defsLayer = document.getElementById("logoDefs");
-		if (!defsLayer)
-		{
-			defsLayer = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"g",
-			);
-			defsLayer.id = "logoDefs";
-			svg.insertBefore(defsLayer, svg.firstChild);
-		}
-		defsLayer.innerHTML = LOGO_DEFS || "";
-
+		// remove any existing logo
 		const old = document.getElementById("logoStatic");
 		if (old && old.parentNode) old.parentNode.removeChild(old);
 
-		const logoSize = Math.floor(hubR * 1.6);
-		const s = logoSize / Math.max(LOGO_VB.width, LOGO_VB.height);
-		const cx = LOGO_VB.minX + LOGO_VB.width / 2;
-		const cy = LOGO_VB.minY + LOGO_VB.height / 2;
+		// size of logo (e.g. 1.6× hub radius, like before)
+		const logoSize = Math.floor(centerRimRadius * 1.6);
 
-		const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-		g.id = "logoStatic";
-		g.setAttribute(
-			"transform",
-			`translate(2, 3) scale(${s}) translate(${-cx}, ${-cy})`,
-		);
-		g.setAttribute("pointer-events", "none");
-		g.innerHTML = LOGO_BODY;
-		svg.appendChild(g);
+		// create <image>
+		const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+		img.id = "logoStatic";
+		img.setAttribute("href", "img/nuaire-logo.png"); // <-- path to your PNG
+		img.setAttribute("width", logoSize);
+		img.setAttribute("height", logoSize);
+		// position so it’s centred at 0,0 (the wheel’s centre)
+		img.setAttribute("x", -logoSize / 2);
+		img.setAttribute("y", -logoSize / 2);
+		img.setAttribute("pointer-events", "none");
+
+		svg.appendChild(img);
 	}
 
 	// --- Build wheel (NO stand, NO pointer) ---
 	function buildWheel()
 	{
-		const R = 300;
 		const rimColor = "#232E49";
-		const rimPx = Math.max(12, Math.floor(R * 0.06));
-		const hubR = Math.max(40, Math.floor(R * 0.24));
+		//const outerRimRadius = Math.max(12, Math.floor(segmentRadius * 0.06));
+		//const centerRimRadius = Math.max(40, Math.floor(segmentRadius * 0.24));
+
+		const segmentRadius = 290; // Radius of segments, the outer edge of wheel
+		const outerRimRadius = segmentRadius; // Radius outer rim, the outer edge of wheel
+		const centerRimRadius = 80; // Radius of centre logo rim
+		const orangeRimRadius = 74 // Radius of centre logo orange rim
 
 		// Clear rotating layer
 		while (gWheel.firstChild) gWheel.removeChild(gWheel.firstChild);
 
-		// Slices + labels + separators
-		const rSlice = R - 4;
+		const svgNS = "http://www.w3.org/2000/svg";
+		const svg = gWheel.closest("svg");
+
+		// Ensure <defs> exists (to store per-slice gradients)
+		let defs = svg.querySelector("defs");
+		if (!defs)
+		{
+			defs = document.createElementNS(svgNS, "defs");
+			svg.insertBefore(defs, svg.firstChild);
+		}
+
+		// Slices + labels
+		const rSlice = segmentRadius - 4;
+
 		for (let i = 0; i < N; i++)
 		{
 			const start = i * slice - Math.PI / 2;
 			const end = start + slice;
-			const t = N > 1 ? i / (N - 1) : 0.5;
-
-			const p = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"path",
-			);
-			p.setAttribute("d", arcWedgePath(rSlice, start, end));
-			p.setAttribute("fill", lerpColorCss(t));
-			gWheel.appendChild(p);
 			const mid = start + slice / 2;
-			const labelG = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"g",
-			);
-			labelG.setAttribute(
-				"transform",
-				`rotate(${((mid * 180) / Math.PI).toFixed(3)})`,
-			);
-			const text = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"text",
-			);
-			text.setAttribute("x", (R * 0.6).toString());
-			text.setAttribute("y", "0");
-			text.setAttribute("fill", "#fff");
-			text.setAttribute("font-size", "18");
-			text.setAttribute("font-weight", "700");
-			text.setAttribute("text-anchor", "middle");
-			text.setAttribute("dominant-baseline", "middle");
-			text.textContent = names[i] || "";
-			labelG.appendChild(text);
+			const midDeg = (mid * 180) / Math.PI;
+
+			// --- per-slice gradient (tangent: left→right across the wedge) ---
+			const gradId = `segGrad-${i}`;
+			const grad = document.createElementNS(svgNS, "linearGradient");
+			grad.setAttribute("id", gradId);
+			grad.setAttribute("gradientUnits", "objectBoundingBox");
+			grad.setAttribute("x1", "0%");
+			grad.setAttribute("y1", "0%");
+			grad.setAttribute("x2", "100%");
+			grad.setAttribute("y2", "0%");
+			grad.setAttribute("gradientTransform", `rotate(${midDeg + 90}, 0.5, 0.5)`);
+			grad.appendChild(makeStop(0, "#009FDF"));
+			grad.appendChild(makeStop(100, "#86cedd"));
+			defs.appendChild(grad);
+
+			// --- slice path using its gradient ---
+			const p = document.createElementNS(svgNS, "path");
+			p.setAttribute("d", arcWedgePath(rSlice, start, end));
+			p.setAttribute("fill", `url(#${gradId})`);
+			p.setAttribute("vector-effect", "non-scaling-stroke");
+			gWheel.appendChild(p);
+
+			// --- label as HTML inside <foreignObject> ---
+			// Where along the radius to place the label block:
+			const labelRadius = (rSlice * 0.63); // roughly where your text was before
+			// Available arc length at that radius (controls wrapping width):
+			const arcLen = labelRadius * slice;          // in SVG user units
+			const foWidth = Math.max(arcLen * 0.9, 80);   // padding & minimum width
+			const foHeight = 42;                           // adjust as needed
+
+			// Rotate a group to the slice's mid angle
+			const labelG = document.createElementNS(svgNS, "g");
+			labelG.setAttribute("transform", `rotate(${midDeg.toFixed(3)})`);
+
+			// Create foreignObject centered on the radial line
+			const fo = document.createElementNS(svgNS, "foreignObject");
+			fo.setAttribute("x", (labelRadius - foWidth / 2).toString());
+			fo.setAttribute("y", (-foHeight / 2).toString());
+			fo.setAttribute("width", foWidth.toString());
+			fo.setAttribute("height", foHeight.toString());
+			fo.setAttribute("pointer-events", "none"); // don't block wheel clicks
+
+			// HTML content (must declare XHTML namespace on the root HTML element)
+			const div = document.createElement("div");
+			div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+			// Basic styling: centered, wrapping, bold, white
+
+			div.textContent = names[i] || "";
+
+
+			fo.appendChild(div);
+			labelG.appendChild(fo);
 			gWheel.appendChild(labelG);
 		}
 
-		// Hub + rim
-		const hub = document.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"circle",
-		);
+		// Hub
+		const hub = document.createElementNS(svgNS, "circle");
 		hub.setAttribute("cx", "0");
 		hub.setAttribute("cy", "0");
-		hub.setAttribute("r", hubR.toString());
+		hub.setAttribute("r", centerRimRadius.toString());
 		hub.setAttribute("fill", rimColor);
 		gWheel.appendChild(hub);
 
-		// Inner orange rim (inside hub)
+		// Inner orange rim
 		const innerRimColor = "#ff8a00";
-		const innerRimPx = Math.max(1, Math.floor(hubR * 0.02)) + 2;
-		const innerR = Math.max(0, Math.floor(hubR * 0.9));
-		const innerRim = document.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"circle",
-		);
+		//const innerRimPx = Math.max(1, Math.floor(centerRimRadius * 0.02)) + 2;
+		//const orangeRimRadius = Math.max(0, Math.floor(centerRimRadius * 0.9));
+		const innerRim = document.createElementNS(svgNS, "circle");
 		innerRim.setAttribute("cx", "0");
 		innerRim.setAttribute("cy", "0");
-		innerRim.setAttribute("r", innerR.toString());
+		innerRim.setAttribute("r", orangeRimRadius.toString());
 		innerRim.setAttribute("fill", "none");
 		innerRim.setAttribute("stroke", innerRimColor);
-		innerRim.setAttribute("stroke-width", innerRimPx.toString());
+		innerRim.setAttribute("stroke-width", "4");
+		innerRim.setAttribute("vector-effect", "non-scaling-stroke");
 		gWheel.appendChild(innerRim);
 
-		const rim = document.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"circle",
-		);
+		// Main rim
+		const rim = document.createElementNS(svgNS, "circle");
 		rim.setAttribute("cx", "0");
 		rim.setAttribute("cy", "0");
-		rim.setAttribute("r", (R - rimPx / 2).toString());
+		rim.setAttribute("r", outerRimRadius.toString());
 		rim.setAttribute("fill", "none");
 		rim.setAttribute("stroke", rimColor);
-		rim.setAttribute("stroke-width", rimPx.toString());
+		rim.setAttribute("stroke-width", "30");
+		rim.setAttribute("vector-effect", "non-scaling-stroke");
 		gWheel.appendChild(rim);
 
-		// Outer green rim (same thickness as inner orange rim)
-		const greenRim = document.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"circle",
-		);
+		// Outer green rim (fixed pixel stroke width)
+		const greenRim = document.createElementNS(svgNS, "circle");
 		greenRim.setAttribute("cx", "0");
 		greenRim.setAttribute("cy", "0");
-		greenRim.setAttribute("r", (R - rimPx / 2).toString());
+		greenRim.setAttribute("r", outerRimRadius.toString());
 		greenRim.setAttribute("fill", "none");
 		greenRim.setAttribute("stroke", "#00A38E");
-		greenRim.setAttribute(
-			"stroke-width",
-			(typeof innerRimPx !== "undefined"
-				? innerRimPx
-				: Math.max(1, Math.floor(hubR * 0.02)) + 2
-			).toString(),
-		);
+		greenRim.setAttribute("stroke-width", "10");
+		greenRim.setAttribute("vector-effect", "non-scaling-stroke");
 		gWheel.appendChild(greenRim);
 
 		// Static center logo (does not rotate)
-		placeStaticLogo(hubR);
+		placeStaticLogo(centerRimRadius);
 
 		// Preserve rotation
 		setWheelRotation(currentRotation);
-		placeStaticPointer(300);
+		placeStaticPointer(segmentRadius);
+
+		// --- helpers ---
+		function makeStop(offsetPct, color)
+		{
+			const s = document.createElementNS(svgNS, "stop");
+			s.setAttribute("offset", offsetPct + "%");
+			s.setAttribute("stop-color", color);
+			return s;
+		}
 	}
 
 	// --- Static pointer drawn inside the wheel SVG (does not rotate) ---
-	function placeStaticPointer(R)
+	function placeStaticPointer(segmentRadius)
 	{
 		const svg = document.getElementById("wheelSvg");
 		if (!svg) return;
@@ -383,7 +406,7 @@
 		// Geometry in wheel units
 		const inset = 40; // tip sits this many units inside the rim
 		const scaleFactor = 1.84; // +40% overall size (20% more than before)
-		const H0 = Math.max(20, Math.floor(R * 0.1));
+		const H0 = Math.max(20, Math.floor(segmentRadius * 0.1));
 		const W0 = Math.max(24, Math.floor(H0 * 0.6));
 		const H = Math.round(H0 * scaleFactor);
 		// Helper: build a rounded-corner triangle path using quadratic curves
@@ -415,7 +438,7 @@
 		const W = Math.round(W0 * scaleFactor);
 
 		// Group positioned at the wheel's top
-		const yTop = -R + inset;
+		const yTop = -segmentRadius + inset;
 		const g = document.createElementNS(ns, "g");
 		g.id = "pointerStatic";
 		g.setAttribute("pointer-events", "none");
@@ -798,7 +821,7 @@
 
 
 // Move Reload + Open config to bottom-left container without breaking behavior
-(function ()
+/*(function ()
 {
 	function moveControls()
 	{
@@ -815,7 +838,7 @@
 		if (config && config.parentNode !== ctl) ctl.appendChild(config);
 	}
 	window.addEventListener("load", moveControls);
-})();
+})();*/
 
 // Ensure pressed visual on touch & keyboard
 (function ()
