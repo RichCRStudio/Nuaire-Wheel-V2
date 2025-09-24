@@ -1,4 +1,27 @@
 /* ------------------------------------
+Fonts
+------------------------------------ */
+
+@font-face
+{
+	font-family: 'ProximaNova';
+	src: url('fonts/PROXIMANOVA_REGULAR.TTF') format('truetype');
+	font-weight: 400;
+	/* normal */
+	font-style: normal;
+}
+
+@font-face
+{
+	font-family: 'ProximaNova';
+	src: url('fonts/PROXIMANOVA_BOLD.OTF') format('opentype');
+	font-weight: 700;
+	/* bold */
+	font-style: normal;
+}
+
+
+/* ------------------------------------
 Font Sizes
 ------------------------------------ */
 
@@ -46,6 +69,8 @@ body
 h1,
 .h1
 {
+	font-family: 'ProximaNova', sans-serif;
+	font-weight: 700;
 	font-size: calc(var(--fs-h1) / 1rem * 1rem);
 	line-height: var(--lh-heading);
 	margin: 0 0 var(--space-3);
@@ -54,7 +79,8 @@ h1,
 h2,
 .h2
 {
-	font-weight: 900;
+	font-family: 'ProximaNova', sans-serif;
+	font-weight: 700;
 	font-size: calc(var(--fs-h2) / 1rem * 1rem);
 	line-height: var(--lh-heading);
 	margin: var(--space-4) 0 var(--space-2);
@@ -63,6 +89,8 @@ h2,
 h3,
 .h3
 {
+	font-family: 'ProximaNova', sans-serif;
+	font-weight: 700;
 	font-size: calc(var(--fs-h3) / 1rem * 1rem);
 	line-height: var(--lh-heading);
 	margin: var(--space-3) 0 var(--space-2);
@@ -344,15 +372,6 @@ body
 
 
 
-
-
-
-
-
-
-
-
-
 .keyboard
 {
 	position: fixed;
@@ -509,7 +528,7 @@ body
 	left: 50%;
 	transform: translate(-50%, -40%);
 	/* your existing styles below */
-	width: min(1320px, 92vw);
+	width: min(1360px, 92vw);
 	padding: 40px 50px;
 	border-radius: 55px;
 	color: #fff;
