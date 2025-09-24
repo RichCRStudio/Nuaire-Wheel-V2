@@ -13,7 +13,7 @@ Font Sizes
 	/* button text */
 	--fs-h1: clamp(36px, 2.6vmin, 72px);
 	/* main title */
-	--fs-h2: 6vmin;
+	--fs-h2: 150px;
 	/* section headings */
 	--fs-h3: 4vmin;
 
@@ -509,9 +509,9 @@ body
 	left: 50%;
 	transform: translate(-50%, -50%);
 	/* your existing styles below */
-	width: min(1200px, 92vw);
+	width: min(1320px, 92vw);
 	padding: 40px 50px;
-	border-radius: 24px;
+	border-radius: 55px;
 	color: #fff;
 	background: linear-gradient(180deg, #1bb1e6 0%, #0a99d2 100%);
 	border: 2px solid rgba(255, 255, 255, 0.45);
@@ -526,7 +526,7 @@ body
 	content: "";
 	position: absolute;
 	inset: 16px;
-	border-radius: 18px;
+	border-radius: 50px;
 	box-shadow:
 		inset 0 0 0 2px rgba(255, 255, 255, 0.35),
 		inset 0 0 28px rgba(255, 255, 255, 0.18);
