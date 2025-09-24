@@ -356,11 +356,11 @@ body
 .keyboard
 {
 	position: fixed;
-	top: 65%;
+	top: 62%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 
-	width: min(1200px, 92vw);
+	width: min(1500px, 95vw);
 	display: none;
 	z-index: 999999;
 	margin: auto;
@@ -382,8 +382,8 @@ body
 .kb-key
 {
 	flex: 1;
-	padding: 14px;
-	font-size: 18px;
+	padding: 25px;
+	font-size: 28px;
 	border: 1px solid #aaa;
 	border-radius: 8px;
 	background: #f5f5f5;
@@ -505,9 +505,9 @@ body
 {
 	position: fixed;
 	/* stick to viewport */
-	top: 50%;
+	top: 40%;
 	left: 50%;
-	transform: translate(-50%, -50%);
+	transform: translate(-50%, -40%);
 	/* your existing styles below */
 	width: min(1320px, 92vw);
 	padding: 40px 50px;
