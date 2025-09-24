@@ -13,13 +13,13 @@ Font Sizes
 	/* button text */
 	--fs-h1: clamp(36px, 2.6vmin, 72px);
 	/* main title */
-	--fs-h2: clamp(28px, 16vmin, 60px);
+	--fs-h2: 6vmin;
 	/* section headings */
-	--fs-h3: clamp(24px, 8vmin, 48px);
+	--fs-h3: clamp(24px, 1.9vmin, 48px);
 
 	/* Line heights */
 	--lh-body: 1.4;
-	--lh-heading: 1;
+	--lh-heading: 1.2;
 
 	/* Touch target + spacing */
 	--touch-target: clamp(48px, 3vmin, 80px);
@@ -192,17 +192,23 @@ body
 /* Place TAP TO SPIN above the wheel */
 #spinBtn
 {
-	/* overrides earlier translateX only */
 	z-index: 12;
 	pointer-events: auto;
 	font-weight: 700;
-	padding: 0.9em 1.6em !important;
-	border-radius: 14px !important;
-	/* overrides earlier 12px */
+
+	/* doubled font size + padding */
+	font-size: 4em;
+	/* add this */
+	padding: .5em 2em !important;
+
+	border-radius: 28px !important;
+	/* scale radius to match */
 	background: #ee752a !important;
 	color: #ffffff !important;
-	border: 3px solid #ffffff !important;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	border: 6px solid #ffffff !important;
+	/* border thicker */
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+	/* shadow scaled up */
 	letter-spacing: 1px;
 	text-transform: uppercase;
 }
@@ -211,8 +217,6 @@ body
 #spinBtn:active,
 #spinBtn.is-pressed
 {
-	padding: 0.9em 1.6em !important;
-	transform-origin: center !important;
 	background: #d4621f !important;
 	/* darker orange */
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -326,10 +330,13 @@ body
 {
 	margin: 0 0 10px;
 	color: #ffffff;
+	font-size: 18vmin;
 }
 
 #congratsMsg h3
-{}
+{
+	font-size: 8vmin;
+}
 
 #congratsMsg #congratsPrize
 {}
@@ -523,17 +530,6 @@ body
 	pointer-events: none;
 }
 
-/* big heading like screenshot */
-#userFormWrap::before
-{
-	content: "ENTER AND WIN!";
-	display: block;
-	margin: 4px 0 18px;
-	font-weight: 800;
-	text-transform: uppercase;
-	text-align: left;
-	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
-}
 
 /* ======= Form base ======= */
 #userForm a
