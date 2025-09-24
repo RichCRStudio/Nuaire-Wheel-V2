@@ -54,6 +54,7 @@ h1,
 h2,
 .h2
 {
+	font-weight: 900;
 	font-size: calc(var(--fs-h2) / 1rem * 1rem);
 	line-height: var(--lh-heading);
 	margin: var(--space-4) 0 var(--space-2);
@@ -358,6 +359,9 @@ body
 	width: min(1200px, 92vw);
 	display: none;
 	z-index: 999999;
+	position: relative;
+	margin: auto;
+	margin-top: 100px;
 }
 
 .keyboard.show
@@ -498,7 +502,7 @@ body
 {
 	width: min(1200px, 92vw);
 	margin: 0 auto 0 auto;
-	padding: 28px 32px 26px;
+	padding: 40px 50px;
 	border-radius: 24px;
 	color: #fff;
 	background: linear-gradient(180deg, #1bb1e6 0%, #0a99d2 100%);
@@ -522,7 +526,7 @@ body
 {
 	content: "";
 	position: absolute;
-	inset: 10px;
+	inset: 16px;
 	border-radius: 18px;
 	box-shadow:
 		inset 0 0 0 2px rgba(255, 255, 255, 0.35),
@@ -545,9 +549,10 @@ body
 	/* hide the label text but keep layout */
 }
 
-#userForm label > br
+#userForm label
 {
-	display: none;
+	margin-bottom: 20px;
+	display: block;
 }
 
 /* text inputs: chunky rounded, white fill */
@@ -585,25 +590,16 @@ body
 
 /* checkboxes inline like the mock */
 #userForm label:has(> input[type="checkbox"])
-{
-	display: inline;
-	align-items: center;
-	gap: 8px;
-	margin: 6px 14px 0 0;
-	font-weight: 700;
-	letter-spacing: 0.01em;
-	color: #fff;
-	vertical-align: sub;
-}
+{}
 
 #userForm input[type="checkbox"]
 {
-	width: 22px;
-	height: 22px;
+	width: 40px;
+	height: 40px;
 	accent-color: #1ea7e6;
 	/* modern browsers */
 	border-radius: 6px;
-	vertical-align: sub;
+	vertical-align: middle;
 }
 
 /* submit button: pill, grey/blue */
