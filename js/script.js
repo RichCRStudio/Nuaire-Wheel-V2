@@ -11,8 +11,6 @@
 
 	showForm();
 
-
-
 	function showForm() {
 		formWrap.classList.add("show");
 		wheelWrap.classList.remove("show");
