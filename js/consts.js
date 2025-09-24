@@ -1,4 +1,4 @@
-CONST initData = [
+const initData = [
 	{ "name": "UMBRELLA",         "weight": 10, "enabled": "TRUE", "stock": 50  },
 	{ "name": "WIRELESS CHARGER", "weight": 20, "enabled": "TRUE", "stock": 500 },
 	{ "name": "5-IN-1 CHARGER",   "weight": 15, "enabled": "TRUE", "stock": 500 },
