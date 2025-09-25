@@ -69,32 +69,28 @@
 	// Hook into your spin finish callback
 	async function onSpinEnd(prizeName)
 	{
-		// Update congratulations text
-		const prizeEl = document.getElementById('congratsPrize');
-		/*if (prizeEl) prizeEl.innerHTML = `
-		A ${prizeName}<br/><br/><br/>
-		<img class="prize-img" src="img/${prizeName}.png"/>
-		`;*/
-		if (prizeEl) prizeEl.innerHTML = `
-		<img class="prize-img" src="img/${prizeName}.png"/>
-		`;
+		const video = document.getElementById('congratsVideo');
+		if (video)
+		{
+			video.querySelector('source').src = `videos/${prizeName}.mp4`;
+			video.load();   // reloads new source
+			video.play();   // start playback
+		}
 
-		// Show congratulations message
-
+		// Show congratulations overlay
 		setTimeout(() =>
 		{
-			hideFormAndWheel();
 			congratsMsg?.classList.add('show');
 
 			setTimeout(() =>
 			{
-				// Hide message
+				// Hide overlay
 				congratsMsg?.classList.remove('show');
 				loadData();
-			}, 10000);
-		}, 2000);
-
+			}, 5000); // show for 10s
+		}, 2000); // delay before showing
 	}
+
 
 	// --- Data storage ---
 	const LS_KEY = "prizes_minimal_v2";
@@ -181,13 +177,38 @@
 	{
 		return [(r * Math.cos(a)).toFixed(2), (r * Math.sin(a)).toFixed(2)];
 	}
+
 	function arcWedgePath(r, start, end)
 	{
-		const [x1, y1] = polarToXY(r, start);
-		const [x2, y2] = polarToXY(r, end);
-		const large = end - start > Math.PI ? 1 : 0;
-		return `M 0 0 L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+		while (end < start) end += Math.PI * 2;
+		const theta = end - start;
+
+		const FULL_EPS = (Math.PI * 2) - 1e-4;
+		if (theta >= FULL_EPS)
+		{
+			const xR = r, yR = 0;
+			return [
+				`M 0 0`,
+				`L ${xR} ${yR}`,
+				`A ${r} ${r} 0 1 1 ${-xR} ${yR}`,
+				`A ${r} ${r} 0 1 1 ${xR} ${yR}`,
+				`Z`
+			].join(" ");
+		}
+
+		const largeArc = theta > Math.PI ? 1 : 0;
+		const x0 = r * Math.cos(start), y0 = r * Math.sin(start);
+		const x1 = r * Math.cos(end), y1 = r * Math.sin(end);
+
+		return [
+			`M 0 0`,
+			`L ${x0} ${y0}`,
+			`A ${r} ${r} 0 ${largeArc} 1 ${x1} ${y1}`,
+			`Z`
+		].join(" ");
 	}
+
+
 	function setWheelRotation(deg)
 	{
 		gWheel.setAttribute("transform", `rotate(${deg})`);
@@ -245,13 +266,17 @@
 	function buildWheel()
 	{
 		const rimColor = "#232E49";
-		//const outerRimRadius = Math.max(12, Math.floor(segmentRadius * 0.06));
-		//const centerRimRadius = Math.max(40, Math.floor(segmentRadius * 0.24));
 
-		const segmentRadius = 290; // Radius of segments, the outer edge of wheel
-		const outerRimRadius = segmentRadius; // Radius outer rim, the outer edge of wheel
-		const centerRimRadius = 80; // Radius of centre logo rim
-		const orangeRimRadius = 74 // Radius of centre logo orange rim
+		const segmentRadius = 290; // outer edge of the wheel
+		const outerRimRadius = segmentRadius;
+		const centerRimRadius = 80;
+		const orangeRimRadius = 74;
+
+		// --- LABEL SETTINGS (tweak these) ---
+		const LABEL_WIDTH = 150;   // fixed label width (wraps consistently)
+		const LABEL_HEIGHT = 60;    // fixed label height
+		const LABEL_OFFSET = 0;     // +ve pushes outward, -ve inward from the mid radius
+		const LABEL_UPRIGHT = false; // true keeps text horizontal; false follows slice angle
 
 		// Clear rotating layer
 		while (gWheel.firstChild) gWheel.removeChild(gWheel.firstChild);
@@ -266,9 +291,15 @@
 			defs = document.createElementNS(svgNS, "defs");
 			svg.insertBefore(defs, svg.firstChild);
 		}
+		else
+		{
+			// clear previous gradients to avoid duplicates
+			defs.innerHTML = "";
+		}
 
 		// Slices + labels
-		const rSlice = segmentRadius - 4;
+		const rSlice = segmentRadius - 4; // where the wedge outer path is drawn
+		const labelBaseRadius = (centerRimRadius + rSlice) / 2; // halfway hub↔rim
 
 		for (let i = 0; i < N; i++)
 		{
@@ -298,36 +329,40 @@
 			p.setAttribute("vector-effect", "non-scaling-stroke");
 			gWheel.appendChild(p);
 
-			// --- label as HTML inside <foreignObject> ---
-			// Where along the radius to place the label block:
-			const labelRadius = (rSlice * 0.63); // roughly where your text was before
-			// Available arc length at that radius (controls wrapping width):
-			const arcLen = labelRadius * slice;          // in SVG user units
-			const foWidth = Math.max(arcLen * 0.9, 80);   // padding & minimum width
-			const foHeight = 42;                           // adjust as needed
+			// --- label (fixed radius + fixed size) ---
+			const labelRadius = Math.round(labelBaseRadius + LABEL_OFFSET);
 
-			// Rotate a group to the slice's mid angle
+			// rotate to mid-angle, then move out to the fixed radius
 			const labelG = document.createElementNS(svgNS, "g");
-			labelG.setAttribute("transform", `rotate(${midDeg.toFixed(3)})`);
+			labelG.setAttribute("transform", `rotate(${midDeg}) translate(${labelRadius},0)`);
 
-			// Create foreignObject centered on the radial line
+			// optional counter-rotation to keep text upright
+			const holderG = document.createElementNS(svgNS, "g");
+			if (LABEL_UPRIGHT) holderG.setAttribute("transform", `rotate(${-midDeg})`);
+
 			const fo = document.createElementNS(svgNS, "foreignObject");
-			fo.setAttribute("x", (labelRadius - foWidth / 2).toString());
-			fo.setAttribute("y", (-foHeight / 2).toString());
-			fo.setAttribute("width", foWidth.toString());
-			fo.setAttribute("height", foHeight.toString());
-			fo.setAttribute("pointer-events", "none"); // don't block wheel clicks
+			fo.setAttribute("x", (-LABEL_WIDTH / 2).toString());
+			fo.setAttribute("y", (-LABEL_HEIGHT / 2).toString());
+			fo.setAttribute("width", LABEL_WIDTH.toString());
+			fo.setAttribute("height", LABEL_HEIGHT.toString());
+			fo.setAttribute("pointer-events", "none");
 
-			// HTML content (must declare XHTML namespace on the root HTML element)
 			const div = document.createElement("div");
 			div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-			// Basic styling: centered, wrapping, bold, white
-
+			// basic centring and wrapping
+			div.style.display = "flex";
+			div.style.alignItems = "center";
+			div.style.justifyContent = "center";
+			div.style.textAlign = "center";
+			div.style.fontWeight = "700";
+			div.style.color = "#fff";
+			div.style.lineHeight = "1.1";
+			div.style.wordBreak = "break-word";
 			div.textContent = names[i] || "";
 
-
 			fo.appendChild(div);
-			labelG.appendChild(fo);
+			holderG.appendChild(fo);
+			labelG.appendChild(holderG);
 			gWheel.appendChild(labelG);
 		}
 
@@ -341,8 +376,6 @@
 
 		// Inner orange rim
 		const innerRimColor = "#ff8a00";
-		//const innerRimPx = Math.max(1, Math.floor(centerRimRadius * 0.02)) + 2;
-		//const orangeRimRadius = Math.max(0, Math.floor(centerRimRadius * 0.9));
 		const innerRim = document.createElementNS(svgNS, "circle");
 		innerRim.setAttribute("cx", "0");
 		innerRim.setAttribute("cy", "0");
@@ -364,7 +397,7 @@
 		rim.setAttribute("vector-effect", "non-scaling-stroke");
 		gWheel.appendChild(rim);
 
-		// Outer green rim (fixed pixel stroke width)
+		// Outer green rim
 		const greenRim = document.createElementNS(svgNS, "circle");
 		greenRim.setAttribute("cx", "0");
 		greenRim.setAttribute("cy", "0");
@@ -393,7 +426,8 @@
 	}
 
 	// --- Static pointer drawn inside the wheel SVG (does not rotate) ---
-	function placeStaticPointer(segmentRadius)
+
+	function placeStaticPointer(/* segmentRadius not used */)
 	{
 		const svg = document.getElementById("wheelSvg");
 		if (!svg) return;
@@ -403,31 +437,45 @@
 		const prev = document.getElementById("pointerStatic");
 		if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
 
-		// Geometry in wheel units
-		const inset = 40; // tip sits this many units inside the rim
-		const scaleFactor = 1.84; // +40% overall size (20% more than before)
-		const H0 = Math.max(20, Math.floor(segmentRadius * 0.1));
-		const W0 = Math.max(24, Math.floor(H0 * 0.6));
-		const H = Math.round(H0 * scaleFactor);
-		// Helper: build a rounded-corner triangle path using quadratic curves
+		// ===== Hard-coded position (SVG user units) =====
+		const yTop = -267; // fixed position, not based on wheel size
+
+		const g = document.createElementNS(ns, "g");
+		g.id = "pointerStatic";
+		g.setAttribute("pointer-events", "none");
+		g.setAttribute("transform", `translate(0, ${yTop})`);
+
+		// Append first (hidden) so we can read its screen CTM
+		g.setAttribute("visibility", "hidden");
+		svg.appendChild(g);
+
+		// ===== Fixed on-screen width =====
+		const desiredPxWidth = 44; // exact on-screen width (px)
+
+		// Convert px -> local units using group's CTM (independent of wheel size)
+		const ctm = g.getScreenCTM();
+		const scaleX = Math.hypot(ctm.a, ctm.b) || 1;
+		const W = desiredPxWidth / scaleX;       // local width that renders as 44px
+		const H = (Math.sqrt(3) / 2) * W;        // equilateral → 60° angles
+
+		// Corner rounding radius
+		const cornerR = Math.max(0, W * 0.10);
+
+		// Helper: rounded-corner triangle
 		function triRoundedPath(ax, ay, bx, by, cx, cy, r)
 		{
 			function off(x1, y1, x2, y2, d)
 			{
-				const vx = x2 - x1,
-					vy = y2 - y1;
+				const vx = x2 - x1, vy = y2 - y1;
 				const L = Math.hypot(vx, vy) || 1;
 				return [x1 + (vx * d) / L, y1 + (vy * d) / L];
 			}
-			const A = [ax, ay],
-				B = [bx, by],
-				C = [cx, cy];
-			const Aab = off(A[0], A[1], B[0], B[1], r),
-				Aac = off(A[0], A[1], C[0], C[1], r);
-			const Bba = off(B[0], B[1], A[0], A[1], r),
-				Bbc = off(B[0], B[1], C[0], C[1], r);
-			const Ccb = off(C[0], C[1], B[0], B[1], r),
-				Cca = off(C[0], C[1], A[0], A[1], r);
+			const A = [ax, ay], B = [bx, by], C = [cx, cy];
+
+			const Aab = off(A[0], A[1], B[0], B[1], r), Aac = off(A[0], A[1], C[0], C[1], r);
+			const Bba = off(B[0], B[1], A[0], A[1], r), Bbc = off(B[0], B[1], C[0], C[1], r);
+			const Ccb = off(C[0], C[1], B[0], B[1], r), Cca = off(C[0], C[1], A[0], A[1], r);
+
 			return (
 				`M ${Aac[0].toFixed(2)},${Aac[1].toFixed(2)} Q ${A[0].toFixed(2)},${A[1].toFixed(2)} ${Aab[0].toFixed(2)},${Aab[1].toFixed(2)} ` +
 				`L ${Bba[0].toFixed(2)},${Bba[1].toFixed(2)} Q ${B[0].toFixed(2)},${B[1].toFixed(2)} ${Bbc[0].toFixed(2)},${Bbc[1].toFixed(2)} ` +
@@ -435,63 +483,45 @@
 			);
 		}
 
-		const W = Math.round(W0 * scaleFactor);
+		// Equilateral triangle pointing down
+		const ax = -W / 2, ay = -H;
+		const bx = 0, by = 0;   // tip
+		const cx = W / 2, cy = -H;
 
-		// Group positioned at the wheel's top
-		const yTop = -segmentRadius + inset;
-		const g = document.createElementNS(ns, "g");
-		g.id = "pointerStatic";
-		g.setAttribute("pointer-events", "none");
-		g.setAttribute("transform", `translate(0, ${yTop})`);
-
-		// Outer triangle (rounded)
+		// Outer
 		const outer = document.createElementNS(ns, "path");
-		const outerScale = 1.1;
-		const W2 = W * outerScale;
-		const H2 = H * outerScale;
-		const widthScale = 1.1; // widen horizontally
-		const W2x = W2 * widthScale;
-		const cornerR = Math.max(4, Math.round(Math.min(W2, H2) * 0.22));
-		const dOuter = triRoundedPath(
-			-W2x / 2,
-			-H2 + 2,
-			0,
-			0 + 2,
-			W2x / 2,
-			-H2 + 2,
-			cornerR,
-		);
-		outer.setAttribute("d", dOuter);
-		outer.setAttribute("fill", "#EE752A"); // orange
-		outer.setAttribute("stroke", "#232e49"); // dark blue
-		outer.setAttribute("stroke-width", "2"); // thinner outer edge
+		outer.setAttribute("d", triRoundedPath(ax, ay, bx, by, cx, cy, cornerR));
+		outer.setAttribute("fill", "#EE752A");
+		outer.setAttribute("stroke", "#232e49");
+		outer.setAttribute("stroke-width", "3");
 		outer.setAttribute("stroke-linejoin", "round");
 		outer.setAttribute("stroke-linecap", "round");
+		outer.setAttribute("vector-effect", "non-scaling-stroke"); // 4px stays 4px
 		g.appendChild(outer);
 
-		// Inner triangle (inset + slight upward nudge)
-		const insetEdge = Math.max(2, Math.floor(W * 0.18));
-		const nudgeYInner = -3;
-		const effW = W * (typeof widthScale !== "undefined" ? widthScale : 1.1);
-		// raise inner triangle slightly
-		const dInner = [
-			`M ${(-(W - insetEdge * 2) / 2).toFixed(2)},${(-H + insetEdge + nudgeYInner).toFixed(2)}`,
-			`L 0,${(-Math.max(0, insetEdge - 2) + nudgeYInner).toFixed(2)}`,
-			`L ${((W - insetEdge * 2) / 2).toFixed(2)},${(-H + insetEdge + nudgeYInner).toFixed(2)}`,
-			"Z",
-		].join(" ");
+		// Inner (inset uniformly)
+		const insetEdge = Math.max(1, W * 0.18);
+		const innerAx = ax + insetEdge, innerAy = ay + insetEdge * Math.tan(Math.PI / 6);
+		const innerBx = 0, innerBy = by - insetEdge;
+		const innerCx = cx - insetEdge, innerCy = cy + insetEdge * Math.tan(Math.PI / 6);
+
 		const inner = document.createElementNS(ns, "path");
-		inner.setAttribute("d", dInner);
-		inner.setAttribute("fill", "#00a38e"); // green
-		inner.setAttribute("stroke", "#232e49"); // dark blue
-		inner.setAttribute("stroke-width", "2");
+		inner.setAttribute("d", triRoundedPath(innerAx, innerAy, innerBx, innerBy, innerCx, innerCy, cornerR * 0.6));
+		inner.setAttribute("fill", "#00a38e");
+		inner.setAttribute("stroke", "#232e49");
+		inner.setAttribute("stroke-width", "3");
 		inner.setAttribute("stroke-linejoin", "round");
 		inner.setAttribute("stroke-linecap", "round");
+		inner.setAttribute("vector-effect", "non-scaling-stroke");
 		g.appendChild(inner);
 
-		// Append last so it sits on top of the wheel graphics
-		svg.appendChild(g);
+		// Reveal
+		g.setAttribute("visibility", "visible");
 	}
+
+
+
+
 
 
 	function toggleSoldOutUI(isSoldOut)

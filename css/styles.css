@@ -195,7 +195,7 @@ body
 
 body
 {
-	font-family: Arial, sans-serif;
+	font-family: 'ProximaNova', sans-serif;
 	background: #fff;
 }
 
@@ -236,6 +236,10 @@ body
 			#009FDF 100%
 			/* bottom edge */
 		);
+
+	stroke-width: 1px;
+	stroke: #000000;
+
 }
 
 
@@ -335,91 +339,37 @@ body
 
 
 /* Full-screen congrats overlay (hidden by default) */
+/* Full-screen overlay */
 #congratsMsg
 {
 	position: fixed;
-	/* cover whole screen */
 	inset: 0;
-	display: grid;
-	place-items: center;
 	z-index: 1000;
 
 	opacity: 0;
 	pointer-events: none;
-	/* clicks pass through when hidden */
+	/* allow clicks through when hidden */
 	transition: opacity 250ms ease;
+	background: #000;
+	/* optional black bg behind video */
 }
 
-/* Show state you can toggle from JS */
+/* Show state */
 #congratsMsg.show
 {
 	opacity: 1;
 	pointer-events: auto;
 }
 
-/* Background video fills screen behind the card */
-#congratsMsg .bg-video
+/* Video fills screen */
+#congratsMsg video
 {
-	position: absolute;
-	inset: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	/* crop to fill */
-	object-position: center;
-	z-index: -1;
-	/* behind the card */
-	filter: brightness(0.85);
-	/* subtle dim so text pops */
+	/* crop/cover full screen */
 }
 
-/* Optional dark scrim over video for contrast */
-#congratsMsg::before
-{
-	content: "";
-	position: absolute;
-	inset: 0;
-	background: linear-gradient(to bottom,
-			rgba(0, 0, 0, 0) 0%,
-			/* fully transparent at top */
-			rgba(0, 0, 0, 0.9) 60%);
-	z-index: 3;
-}
-
-/* Center card */
-#congratsMsg .card
-{
-	padding: 28px 36px;
-	text-align: center;
-	z-index: 5;
-}
-
-/* Optional image at the top of the card */
-#congratsMsg .card img.prize-img
-{
-	display: block;
-	width: 90%;
-	max-width: 1200px;
-	height: auto;
-	margin: 0 auto 12px;
-}
-
-#congratsMsg h2,
-#congratsMsg h3,
-#congratsMsg #congratsPrize
-{
-	margin: 0 0 10px;
-	color: #ffffff;
-	font-size: 18vmin;
-}
-
-#congratsMsg h3
-{
-	font-size: 8vmin;
-}
-
-#congratsMsg #congratsPrize
-{}
 
 
 
@@ -834,4 +784,13 @@ body
 	border-bottom: 5px solid #9CA4AC;
 	transform: rotate(45deg) translateY(-50%);
 	margin-right: 10px;
+}
+
+
+#soldOutMsg
+{
+	width: 90%;
+	margin: auto;
+	margin-top: 400px;
+	position: relative;
 }
