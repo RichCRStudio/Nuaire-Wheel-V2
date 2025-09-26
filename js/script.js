@@ -79,12 +79,7 @@
 		}
 	});
 
-	// If the user just waits, you could also auto-advance at video end (optional):
-	landingVideo?.addEventListener('ended', () =>
-	{
-		if (introIndex === 0) playIntro(1);
-		else finishLanding();
-	});
+
 
 
 	showLanding();
@@ -350,7 +345,7 @@
 		const orangeRimRadius = 74;
 
 		// --- LABEL SETTINGS (tweak these) ---
-		const LABEL_WIDTH = 150;   // fixed label width (wraps consistently)
+		const LABEL_WIDTH = 170;   // fixed label width (wraps consistently)
 		const LABEL_HEIGHT = 60;    // fixed label height
 		const LABEL_OFFSET = 0;     // +ve pushes outward, -ve inward from the mid radius
 		const LABEL_UPRIGHT = false; // true keeps text horizontal; false follows slice angle
