@@ -25,14 +25,44 @@
 	let introIndex = 0;
 	let landingFinished = false;
 	let advancing = false; // debounce rapid double-taps
-
 	function showLanding()
 	{
+		// Show landing, hide everything else
 		landing?.classList.remove('hide');
 		formWrap?.classList.remove('show');
 		wheelWrap?.classList.remove('show');
 		congratsMsg?.classList.remove('show');
+		soldOutMsg?.classList.remove('show');
+
+		// Reset state flags
+		landingFinished = false;
+		advancing = false;
+		introIndex = 0;
+
+		// Restart the intro video loop
+		if (landingVideo)
+		{
+			let s = landingVideo.querySelector('source');
+			if (!s)
+			{
+				s = document.createElement('source');
+				landingVideo.appendChild(s);
+			}
+			s.src = introVideos[0];
+			s.type = s.src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : 'video/quicktime';
+
+			landingVideo.muted = true;
+			landingVideo.playsInline = true;
+			landingVideo.loop = true;   // loop until user taps
+
+			try { landingVideo.load(); } catch { }
+			landingVideo.play().catch(() =>
+			{
+				// if autoplay blocked, show your "Tap to start" hint
+			});
+		}
 	}
+
 
 	function setLandingPlaying(on)
 	{
@@ -167,23 +197,23 @@
 	// Hook into your spin finish callback
 	async function onSpinEnd(prizeName)
 	{
-		const video = document.getElementById('congratsVideo');
-		if (video)
-		{
-			video.querySelector('source').src = `videos/${prizeName}.mp4`;
-			video.load();   // reloads new source
-			video.play();   // start playback
-		}
-
 		// Show congratulations overlay
 		setTimeout(() =>
 		{
 			congratsMsg?.classList.add('show');
 
+			const video = document.getElementById('congratsVideo');
+			if (video)
+			{
+				video.querySelector('source').src = `videos/${prizeName}.mp4`;
+				video.load();   // reloads new source
+				video.play();   // start playback
+			}
+
 			setTimeout(() =>
 			{
 				// Hide overlay
-				congratsMsg?.classList.remove('show');
+				showLanding();
 				loadData();
 			}, 5000); // show for 10s
 		}, 2000); // delay before showing
@@ -536,7 +566,7 @@
 		if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
 
 		// ===== Hard-coded position (SVG user units) =====
-		const yTop = -267; // fixed position, not based on wheel size
+		const yTop = -260; // fixed position, not based on wheel size
 
 		const g = document.createElementNS(ns, "g");
 		g.id = "pointerStatic";
@@ -548,7 +578,7 @@
 		svg.appendChild(g);
 
 		// ===== Fixed on-screen width =====
-		const desiredPxWidth = 44; // exact on-screen width (px)
+		const desiredPxWidth = 60; // exact on-screen width (px)
 
 		// Convert px -> local units using group's CTM (independent of wheel size)
 		const ctm = g.getScreenCTM();
@@ -711,13 +741,14 @@
 		setLocalPrizes(all);
 	}
 
-	spinBtn.addEventListener("click", () =>
+
+	function startSpin()
 	{
 		if (isSpinning || N === 0) return;
 		isSpinning = true;
 		spinBtn.disabled = true;
-		//reloadBtn.disabled = true;
-		log.textContent = "Spinning...";
+		//log.textContent = "Spinning...";
+
 		const chosen = Math.floor(Math.random() * N);
 		const sliceDeg = 360 / N;
 		const centerDeg = chosen * sliceDeg + sliceDeg / 2;
@@ -725,18 +756,36 @@
 		const align = positiveMod(-centerDeg - remainder, 360);
 		const extraTurns = 4;
 		const finalRot = currentRotation + extraTurns * 360 + align;
+
 		animateSpin(currentRotation, finalRot, 3000, () =>
 		{
 			currentRotation = finalRot;
 			const name = names[chosen];
-			log.textContent = `Winner: ${name}`;
+			//log.textContent = `Winner: ${name}`;
 			decrementStockByName(name);
 			onSpinEnd(name);
 			isSpinning = false;
 			spinBtn.disabled = false;
-			//reloadBtn.disabled = false;
 		});
+	}
+
+	// spin anywhere in the wheel screen
+	document.body.addEventListener("click", (e) =>
+	{
+		// Only spin if the wheel is visible
+		if (!wheelWrap.classList.contains("show")) return;
+
+		// Optional: ignore clicks on overlays like congrats or terms modal
+		if (e.target.closest("#congratsMsg, #soldOutMsg, #termsModal")) return;
+
+		// Prevent double-trigger if the button itself was clicked
+		if (e.target.closest("#spinBtn")) return;
+
+		startSpin();
 	});
+
+
+
 
 	//* Reload data from original prixes data */
 	//reloadBtn.addEventListener("click", clearLocalPrizes);
@@ -861,7 +910,7 @@
 	  if (!wrap || !wheel || !layer || !window.STAND_VIEWBOX || !window.STAND_BODY) return;
 	
 	  // layer styling
-
+	
 	  const wrapRect  = wrap.getBoundingClientRect();
 	  const wheelRect = wheel.getBoundingClientRect();
 	
@@ -916,12 +965,12 @@
 	  layer.innerHTML = "";
 	  layer.appendChild(s);
 	}
-
+	
 	window.addEventListener("load", mountStand);
 	window.addEventListener("resize", mountStand);
 	
-
-
+	
+	
 	function setupStandMount() {
 	// run after layout
 	requestAnimationFrame(() => requestAnimationFrame(mountStand));
@@ -998,34 +1047,34 @@
 	{
 		var layer = document.getElementById("standLayer");
 		if (!layer) return;
-
+	
 		// Find the stand's SVG the overlay script created
 		var svg = layer.querySelector("svg");
 		if (!svg) return;
-
+	
 		// Avoid duplicates
 		if (svg.querySelector("#standBaseRect")) return;
-
+	
 		// Use the stand's viewBox units so it scales cleanly
 		var vb =
 			svg.viewBox && svg.viewBox.baseVal
 				? svg.viewBox.baseVal
 				: { x: 0, y: 0, width: 100, height: 100 };
-
+	
 		var vbW = vb.width,
 			vbH = vb.height;
 		var ns = "http://www.w3.org/2000/svg";
-
+	
 		// CSS-pixel to viewBox-units scale (for precise pixel offsets)
 		var px2vb = vbH / (svg.getBoundingClientRect().height || 1);
-
+	
 		// Geometry (thinner, lowered by 25px, slight rounding)
 		var rectW = vbW * 0.92; // width (70% of stand width)
 		var rectH = vbH * 0.07; // thinner: 7% of stand height
 		var rectX = (vbW - rectW) / 2; // centered
 		var rectY = vbH * 0.82 + 40 * px2vb; // lowered by 25px
 		var rad = vbH * 0.028; // reduced corner radius
-
+	
 		var r = document.createElementNS(ns, "rect");
 		r.setAttribute("id", "standBaseRect");
 		r.setAttribute("x", rectX);
@@ -1036,11 +1085,11 @@
 		r.setAttribute("ry", rad);
 		r.setAttribute("fill", "#3f5d8a"); // lighter blue
 		r.setAttribute("opacity", "1");
-
+	
 		// Append on top of the stand artwork (still behind the wheel via z-index)
 		svg.appendChild(r);
 	}
-
+	
 	window.addEventListener("load", addBaseRect);
 	window.addEventListener("resize", addBaseRect);
 })();
