@@ -14,11 +14,18 @@
 	const soldOutMsg = document.getElementById('soldOutMsg');
 
 
-	// --- Landing overlay (2 videos then proceed) ---
+	// --- Landing overlay (tap-only, no auto-advance) ---
 	const landing = document.getElementById('landing');
 	const landingVideo = document.getElementById('landingVideo');
 
-	// Keep the form/wheel hidden until landing completes
+	const introVideos = [
+		"videos/intro.mp4", // intro video
+	];
+
+	let introIndex = 0;
+	let landingFinished = false;
+	let advancing = false; // debounce rapid double-taps
+
 	function showLanding()
 	{
 		landing?.classList.remove('hide');
@@ -27,57 +34,86 @@
 		congratsMsg?.classList.remove('show');
 	}
 
-	// Advance logic: click anywhere on the landing to go 1->2->page
-	const introVideos = [
-		"videos/Screen1.mp4",
-		"videos/Screen2.mp4"
-	];
-	let introIndex = 0;
+	function setLandingPlaying(on)
+	{
+		if (!landing) return;
+		landing.classList.toggle('playing', !!on); // hide the "Tap" hint if you use it
+	}
 
 	function playIntro(i)
 	{
 		if (!landingVideo) return;
 		introIndex = i;
-		const src = introVideos[i];
-		// swap source safely
-		const sourceEl = landingVideo.querySelector('source') || document.createElement('source');
-		sourceEl.src = src;
-		// guess type from extension (safari likes explicit types)
-		sourceEl.type = src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : 'video/quicktime';
-		if (!sourceEl.parentNode) landingVideo.appendChild(sourceEl);
 
-		// ensure muted/playsinline for kiosk autoplay
+		// swap source safely
+		let s = landingVideo.querySelector('source');
+		if (!s) { s = document.createElement('source'); landingVideo.appendChild(s); }
+		s.src = introVideos[i];
+		s.type = s.src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : 'video/quicktime';
+
 		landingVideo.muted = true;
 		landingVideo.playsInline = true;
 
-		landingVideo.load();
-		landing.classList.remove('needs-tap');
+		try { landingVideo.load(); } catch { }
+		setLandingPlaying(false);
 
-		landingVideo.play().catch(() =>
-		{
-			// Autoplay blocked until a user gesture — show a hint
-			landing.classList.add('needs-tap');
-		});
+		landingVideo.play()
+			.then(() => setLandingPlaying(true))
+			.catch(() =>
+			{
+				// autoplay blocked until tap; keep hint visible
+				setLandingPlaying(false);
+			});
 	}
 
-	function finishLanding()
+	// TAP to advance (even while video is still playing)
+	function advanceLanding()
 	{
-		landing?.classList.add('hide');
-		// After landing, show the normal first screen (the form)
-		showForm();
-	}
+		if (advancing || landingFinished) return;
+		advancing = true;
 
-	// Click anywhere on the overlay to advance
-	landing?.addEventListener('click', () =>
-	{
 		if (introIndex === 0)
 		{
 			playIntro(1);
+			// re-enable tap quickly after source swap
+			setTimeout(() => advancing = false, 150);
 		} else
 		{
 			finishLanding();
 		}
+	}
+
+	landing?.addEventListener('click', (e) =>
+	{
+		e.preventDefault();
+		advanceLanding();
 	});
+
+	// IMPORTANT: no 'ended' listener — we never auto-advance
+
+	function finishLanding()
+	{
+		if (landingFinished) return;
+		landingFinished = true;
+
+		// Hide overlay
+		landing?.classList.add('hide');
+
+		// Stop media and fully detach so nothing fires later
+		if (landingVideo)
+		{
+			try { landingVideo.pause(); } catch { }
+			// remove sources to completely tear down decode pipeline
+			const s = landingVideo.querySelector('source');
+			if (s) s.removeAttribute('src');
+			landingVideo.removeAttribute('src');
+			try { landingVideo.load(); } catch { }
+		}
+
+		// Proceed to your app's first screen (the form)
+		showForm();
+	}
+
 
 
 
