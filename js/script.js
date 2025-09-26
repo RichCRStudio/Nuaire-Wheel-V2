@@ -13,7 +13,7 @@
 	const landingVideo = document.getElementById("landingVideo");
 
 	// sequence: screen1.mp4 → tap → screen2.mp4 → tap → form
-	const introVideos = ["videos/screen1.mp4", "videos/screen2.mp4"];
+	const introVideos = ["videos/Screen1.mp4", "videos/Screen2.mp4"];
 
 	let introIndex = 0;
 	let landingFinished = false;
