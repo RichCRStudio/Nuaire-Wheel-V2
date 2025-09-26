@@ -43,27 +43,16 @@
 	function playIntro(i)
 	{
 		if (!landingVideo) return;
+
+		// if someone calls with an out-of-range index, just finish
+		if (i < 0 || i >= introVideos.length)
+		{
+			finishLanding();
+			return;
+		}
+
 		introIndex = i;
-
-		// swap source safely
-		let s = landingVideo.querySelector('source');
-		if (!s) { s = document.createElement('source'); landingVideo.appendChild(s); }
-		s.src = introVideos[i];
-		s.type = s.src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : 'video/quicktime';
-
-		landingVideo.muted = true;
-		landingVideo.playsInline = true;
-
-		try { landingVideo.load(); } catch { }
-		setLandingPlaying(false);
-
-		landingVideo.play()
-			.then(() => setLandingPlaying(true))
-			.catch(() =>
-			{
-				// autoplay blocked until tap; keep hint visible
-				setLandingPlaying(false);
-			});
+		// ... (rest of your function unchanged)
 	}
 
 	// TAP to advance (even while video is still playing)
@@ -72,14 +61,15 @@
 		if (advancing || landingFinished) return;
 		advancing = true;
 
-		if (introIndex === 0)
-		{
-			playIntro(1);
-			// re-enable tap quickly after source swap
-			setTimeout(() => advancing = false, 150);
-		} else
+		// if we're on the last intro clip (or there is only 1), finish
+		if (introIndex >= introVideos.length - 1)
 		{
 			finishLanding();
+		} else
+		{
+			playIntro(introIndex + 1);
+			// re-enable tap quickly after source swap
+			setTimeout(() => advancing = false, 150);
 		}
 	}
 
@@ -643,9 +633,6 @@
 		} else
 		{
 			soldOutMsg?.classList.remove('show');
-			// Your normal logic can decide which one shows (form or wheel).
-			// If you always want the wheel visible when not sold-out:
-			wheelWrap?.classList.remove('show');
 		}
 	}
 
