@@ -616,3 +616,234 @@
 		showLanding();
 	}
 })();
+
+
+// --- On-screen keyboard for ALL inputs ---
+// Auto Title Case for Name & Company fields
+// Virtual Keyboard with Shift, Caps, and field-specific casing
+(function ()
+{
+	const kb = document.getElementById("vkb");
+	if (!kb) return;
+
+	// Which inputs use the keyboard?
+	const fields = document.querySelectorAll(
+		'#userForm input[type="text"], #userForm input[type="email"], #userForm input[type="search"], #userForm input[type="tel"], #userForm input:not([type])'
+	);
+
+	let active = null;
+
+	const state = {
+		shift: false,         // one-shot
+		caps: false,          // sticky
+		autoCapNext: false,   // for name/company (first char and after spaces)
+		forceLower: false     // for email
+	};
+
+	function isNameLike(el)
+	{
+		return el && (el.id === "name" || el.id === "company");
+	}
+	function isEmail(el)
+	{
+		return el && el.id === "email";
+	}
+
+	// Update the printed labels (letters only). Space/@/.-_ etc are left alone.
+	function updateLabels()
+	{
+		const keys = kb.querySelectorAll('.kb-key[data-key]');
+		keys.forEach(k =>
+		{
+			const base = (k.getAttribute('data-key') || '').toLowerCase();
+
+			// Only change 1-char A–Z letter keys
+			if (base.length === 1 && /[a-z]/.test(base))
+			{
+				const shouldUpper =
+					(state.caps ^ state.shift) || (isNameLike(active) && state.autoCapNext);
+				k.textContent = shouldUpper ? base.toUpperCase() : base.toLowerCase();
+			}
+		});
+
+		// Optional: add a visual cue for shift/caps if you style `.on`
+		kb.querySelectorAll('.kb-key[data-action="shift"]').forEach(el => el.classList.toggle('on', state.shift));
+		kb.querySelectorAll('.kb-key[data-action="caps"]').forEach(el => el.classList.toggle('on', state.caps));
+	}
+
+	function showKB(forEl)
+	{
+		if (!forEl || forEl.disabled || forEl.readOnly) return;
+		active = forEl;
+
+		// Mode per field
+		state.forceLower = isEmail(active);
+		if (isNameLike(active))
+		{
+			const v = active.value || "";
+			state.autoCapNext = v.length === 0 || /\s$/.test(v);
+		} else
+		{
+			state.autoCapNext = false;
+		}
+		// Do not force shift on; we preview using autoCapNext
+		state.shift = false;
+
+		updateLabels();
+		kb.classList.add("show");
+		kb.setAttribute("aria-hidden", "false");
+		active.focus();
+	}
+
+	function hideKB()
+	{
+		kb.classList.remove("show");
+		kb.setAttribute("aria-hidden", "true");
+		active = null;
+		state.shift = false;
+		updateLabels();
+	}
+
+	function backspace()
+	{
+		if (!active) return;
+		const s = active.selectionStart ?? active.value.length;
+		const e = active.selectionEnd ?? s;
+
+		if (s !== e)
+		{
+			active.value = active.value.slice(0, s) + active.value.slice(e);
+			active.setSelectionRange(s, s);
+		} else if (s > 0)
+		{
+			active.value = active.value.slice(0, s - 1) + active.value.slice(s);
+			active.setSelectionRange(s - 1, s - 1);
+		}
+
+		// After backspace, decide autoCapNext for name/company
+		if (isNameLike(active))
+		{
+			const left = active.value.slice(0, active.selectionStart ?? 0);
+			state.autoCapNext = left.length === 0 || /\s$/.test(left);
+		}
+
+		active.dispatchEvent(new Event("input", { bubbles: true }));
+		active.focus();
+		updateLabels();
+	}
+
+	function clearField()
+	{
+		if (!active) return;
+		active.value = "";
+		active.dispatchEvent(new Event("input", { bubbles: true }));
+		active.focus();
+		if (isNameLike(active)) state.autoCapNext = true;
+		updateLabels();
+	}
+
+	function insertChar(rawKey)
+	{
+		if (!active) return;
+
+		// base key (normalize to lower for processing)
+		let ch = (rawKey || "").toString();
+		let base = ch.toLowerCase();
+
+		// Compute casing for letters
+		if (/[a-z]/i.test(base))
+		{
+			let makeUpper = false;
+
+			// Email is always lower
+			if (state.forceLower)
+			{
+				base = base.toLowerCase();
+			} else
+			{
+				if (state.caps ^ state.shift) makeUpper = true;                         // Shift XOR Caps
+				if (!state.caps && !state.shift && isNameLike(active) && state.autoCapNext)
+				{
+					makeUpper = true;                                                     // Auto-cap first/after space
+				}
+				base = makeUpper ? base.toUpperCase() : base.toLowerCase();
+			}
+		}
+
+		// Insert into input preserving selection
+		const s = active.selectionStart ?? active.value.length;
+		const e = active.selectionEnd ?? s;
+		const before = active.value.slice(0, s);
+		const after = active.value.slice(e);
+		active.value = before + base + after;
+		const p = s + base.length;
+		active.setSelectionRange(p, p);
+		active.dispatchEvent(new Event("input", { bubbles: true }));
+		active.focus();
+
+		// Update autoCapNext for name/company
+		if (isNameLike(active))
+		{
+			if (base === " ") state.autoCapNext = true;
+			else if (/[A-Za-z]/.test(base)) state.autoCapNext = false;
+		}
+
+		// Shift is one-shot
+		if (state.shift) state.shift = false;
+
+		updateLabels();
+	}
+
+	// Event delegation for the whole keyboard
+	kb.addEventListener("click", (ev) =>
+	{
+		const t = ev.target.closest(".kb-key");
+		if (!t) return;
+
+		const action = t.getAttribute("data-action");
+		if (action === "back") return backspace();
+		if (action === "clear") return clearField();
+		if (action === "done") return hideKB();
+		if (action === "shift") { state.shift = !state.shift; return updateLabels(); }
+		if (action === "caps") { state.caps = !state.caps; return updateLabels(); }
+
+		const key = t.getAttribute("data-key");
+		if (key != null) insertChar(key);
+	});
+
+	// Wire inputs
+	fields.forEach((el) =>
+	{
+		el.addEventListener("focus", () => showKB(el));
+		el.addEventListener("click", () => showKB(el));
+
+		if (isEmail(el))
+		{
+			el.setAttribute("autocapitalize", "none");
+			el.addEventListener("input", () =>
+			{
+				// Hard-enforce lowercase for email (caret preserved)
+				const pos = el.selectionStart;
+				const v = el.value;
+				const lower = v.toLowerCase();
+				if (v !== lower)
+				{
+					el.value = lower;
+					if (pos != null) el.setSelectionRange(pos, pos);
+				}
+			});
+		} else if (isNameLike(el))
+		{
+			el.setAttribute("autocapitalize", "words");
+		}
+	});
+
+	// Hide keyboard when tapping outside inputs & keyboard
+	document.addEventListener("pointerdown", (ev) =>
+	{
+		const target = ev.target;
+		const clickedAnInput = [...fields].some((el) => el === target || el.contains(target));
+		if (!clickedAnInput && !kb.contains(target)) hideKB();
+	});
+})();
+
