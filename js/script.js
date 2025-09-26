@@ -600,12 +600,20 @@
 		});
 	}
 
+	// Spin on #spinBtn click
+	spinBtn.addEventListener("click", (e) =>
+	{
+		if (SOLD_OUT) return;
+		if (!wheelWrap.classList.contains("show")) return;
+		startSpin();
+	});
+
+	// Spin on any other screen tap
 	document.body.addEventListener("click", (e) =>
 	{
 		if (SOLD_OUT) return;
 		if (!wheelWrap.classList.contains("show")) return;
-		if (e.target.closest("#congratsMsg, #soldOutMsg, #termsModal")) return;
-		if (e.target.closest("#spinBtn")) return;
+		if (e.target.closest("#congratsMsg, #soldOutMsg, #termsModal, #spinBtn")) return;
 		startSpin();
 	});
 
