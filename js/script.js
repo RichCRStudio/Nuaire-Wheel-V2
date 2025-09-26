@@ -13,7 +13,84 @@
 	const congratsMsg = document.getElementById('congratsMsg');
 	const soldOutMsg = document.getElementById('soldOutMsg');
 
-	showForm();
+
+	// --- Landing overlay (2 videos then proceed) ---
+	const landing = document.getElementById('landing');
+	const landingVideo = document.getElementById('landingVideo');
+
+	// Keep the form/wheel hidden until landing completes
+	function showLanding()
+	{
+		landing?.classList.remove('hide');
+		formWrap?.classList.remove('show');
+		wheelWrap?.classList.remove('show');
+		congratsMsg?.classList.remove('show');
+	}
+
+	// Advance logic: click anywhere on the landing to go 1->2->page
+	const introVideos = [
+		"videos/Screen1.mp4",
+		"videos/Screen2.mp4"
+	];
+	let introIndex = 0;
+
+	function playIntro(i)
+	{
+		if (!landingVideo) return;
+		introIndex = i;
+		const src = introVideos[i];
+		// swap source safely
+		const sourceEl = landingVideo.querySelector('source') || document.createElement('source');
+		sourceEl.src = src;
+		// guess type from extension (safari likes explicit types)
+		sourceEl.type = src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : 'video/quicktime';
+		if (!sourceEl.parentNode) landingVideo.appendChild(sourceEl);
+
+		// ensure muted/playsinline for kiosk autoplay
+		landingVideo.muted = true;
+		landingVideo.playsInline = true;
+
+		landingVideo.load();
+		landing.classList.remove('needs-tap');
+
+		landingVideo.play().catch(() =>
+		{
+			// Autoplay blocked until a user gesture — show a hint
+			landing.classList.add('needs-tap');
+		});
+	}
+
+	function finishLanding()
+	{
+		landing?.classList.add('hide');
+		// After landing, show the normal first screen (the form)
+		showForm();
+	}
+
+	// Click anywhere on the overlay to advance
+	landing?.addEventListener('click', () =>
+	{
+		if (introIndex === 0)
+		{
+			playIntro(1);
+		} else
+		{
+			finishLanding();
+		}
+	});
+
+	// If the user just waits, you could also auto-advance at video end (optional):
+	landingVideo?.addEventListener('ended', () =>
+	{
+		if (introIndex === 0) playIntro(1);
+		else finishLanding();
+	});
+
+
+	showLanding();
+	playIntro(0);
+
+
 
 	function showForm()
 	{
@@ -562,7 +639,6 @@
 		}
 		else
 		{
-			showForm();
 			toggleSoldOutUI(false);
 		}
 
