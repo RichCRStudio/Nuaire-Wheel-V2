@@ -43,7 +43,7 @@ Font Sizes
 	/* typed text in fields */
 	--fs-button: clamp(22px, 1.7vmin, 40px);
 	/* button text */
-	--fs-h1: clamp(36px, 2.6vmin, 72px);
+	--fs-h1: 150px;
 	/* main title */
 	--fs-h2: 150px;
 	/* section headings */
@@ -79,7 +79,7 @@ h1,
 .h1
 {
 	font-family: 'ProximaNova', sans-serif;
-	font-weight: 700;
+	font-weight: 900;
 	font-size: calc(var(--fs-h1) / 1rem * 1rem);
 	line-height: var(--lh-heading);
 	margin: 0 0 var(--space-3);
@@ -147,34 +147,11 @@ button,
 	font-size: calc(var(--fs-button) / 1rem * 1rem);
 }
 
-button:focus-visible,
-.input-button:focus-visible,
-.button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible
-{}
-
 /* Helper: bigger hit area for small controls (if any) */
 .input--tap-target
 {
 	min-height: var(--touch-target);
 }
-
-/* Portrait 4K kiosks often have lots of vertical space.
-   If you prefer slightly larger vertical rhythm, bump spacing in tall viewports. */
-@media (min-height: 1600px)
-{
-	:root
-	{
-		--space-1: clamp(10px, 0.7vmin, 18px);
-		--space-2: clamp(14px, 1.0vmin, 28px);
-		--space-3: clamp(18px, 1.3vmin, 36px);
-		--space-4: clamp(24px, 1.8vmin, 48px);
-	}
-}
-
-
 
 
 /* ------------------------------------
@@ -330,7 +307,7 @@ div
 	font-family: 'ProximaNova', sans-serif;
 	z-index: 12;
 	pointer-events: auto;
-	font-weight: 700;
+	font-weight: 900;
 
 	/* doubled font size + padding */
 	font-size: 150px;
@@ -517,7 +494,7 @@ div
 	width: 100%;
 	position: relative;
 	margin-left: 50%;
-	margin-top: 20px;
+	margin-top: 105px;
 	transform: translateX(-50%);
 	z-index: 6;
 	pointer-events: none;
@@ -616,6 +593,12 @@ div
 }
 
 
+#userFormWrap .form-title
+{
+	text-align: center;
+}
+
+
 /* ======= Form base ======= */
 #userForm a
 {
@@ -627,13 +610,6 @@ div
 #userForm label:has(> input[type="email"])
 {
 	font-size: 0;
-	/* hide the label text but keep layout */
-}
-
-#userForm label
-{
-	margin-bottom: 20px;
-	display: block;
 }
 
 /* text inputs: chunky rounded, white fill */
@@ -642,7 +618,7 @@ div
 {
 	width: 100%;
 	height: 48px;
-	margin: 14px 0;
+	margin: 0 0 60px 0;
 	padding: 0 18px;
 	border: 0;
 	border-radius: 15px;
@@ -653,6 +629,11 @@ div
 	box-shadow:
 		inset 0 -2px 0 rgba(0, 0, 0, 0.04),
 		0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+#userForm input[type="email"]
+{
+	margin: 0 0 20px 0;
 }
 
 #userForm input::placeholder
@@ -669,19 +650,48 @@ div
 		inset 0 -2px 0 rgba(0, 0, 0, 0.04);
 }
 
-/* checkboxes inline like the mock */
-#userForm label:has(> input[type="checkbox"])
-{}
 
-#userForm input[type="checkbox"]
+/* Reset native styles */
+input[type="checkbox"]
 {
-	width: 40px;
-	height: 40px;
-	accent-color: #1ea7e6;
-	/* modern browsers */
+	-webkit-appearance: none;
+	/* Safari / iOS */
+	-moz-appearance: none;
+	/* Firefox */
+	appearance: none;
+
+	width: 50px;
+	/* size */
+	height: 50px;
+
 	border-radius: 6px;
+	/* rounded corners */
+	background: #fff;
+	cursor: pointer;
+	position: relative;
 	vertical-align: middle;
+	margin: 0px 10px 5px 0px;
 }
+
+/* Checked state */
+input[type="checkbox"]:checked
+{
+	background: #86CDDD;
+}
+
+/* Optional checkmark */
+input[type="checkbox"]:checked::after
+{
+	content: "✓";
+	color: #fff;
+	font-size: 40px;
+	font-weight: 900;
+	position: absolute;
+	top: 55%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
 
 /* submit button: pill, grey/blue */
 #userForm button[type="submit"]
@@ -689,13 +699,13 @@ div
 	float: right;
 	/* position at right like screenshot */
 	margin-top: 6px;
-	padding: 10px 20px 8px 20px;
+	padding: 20px 30px 18px 30px;
 	border: 0;
-	border-radius: 8px;
+	border-radius: 15px;
 	border: 1px solid #ffffff;
 	background: #86CDDD;
 	color: #fff;
-	font-weight: 800;
+	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
 	cursor: pointer;
@@ -722,29 +732,23 @@ div
 	clear: both;
 }
 
-/* responsive tweaks */
-@media (max-width: 520px)
+#userFormControls
 {
-	#userFormWrap
-	{
-		padding: 22px 18px 20px;
-		border-radius: 20px;
-	}
-
-	#userForm input[type="text"],
-	#userForm input[type="email"]
-	{}
-
-	#userForm label:has(> input[type="checkbox"])
-	{}
-
-	#userForm button[type="submit"]
-	{
-		float: none;
-		width: 100%;
-		margin-top: 12px;
-	}
+	line-height: 70px;
+	margin: 40px 0;
 }
+
+#userFormControls label,
+#userFormControls button
+{
+	display: inline;
+}
+
+#userFormControls label
+{
+	margin: 20px 40px 20px 0;
+}
+
 
 
 
@@ -855,4 +859,29 @@ div
 	margin: auto;
 	margin-top: 400px;
 	position: relative;
+}
+
+
+/* Overlay container */
+#confettiOverlay
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: black;
+	/* fallback */
+	z-index: 99999;
+	/* on top of everything */
+	overflow: hidden;
+}
+
+/* Video styling */
+#confettiOverlay video
+{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	/* fills screen, crops if needed */
 }
