@@ -503,6 +503,15 @@
 		document.getElementById('termsModal').style.display = 'none';
 	});
 
+	const exit = document.getElementById('exit');
+	exit.addEventListener('click', function (e)
+	{
+		e.preventDefault();
+		const form = document.getElementById('userForm');
+		form.reset();
+		showLanding();
+	});
+
 
 
 

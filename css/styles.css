@@ -320,6 +320,7 @@ div
 	font-family: 'ProximaNova', sans-serif;
 	z-index: 12;
 	pointer-events: auto;
+	cursor: pointer;
 	font-weight: 900;
 
 	/* doubled font size + padding */
@@ -737,6 +738,43 @@ input[type="checkbox"]:checked::after
 {
 	transform: translateY(1px);
 }
+
+#exit
+{
+	position: absolute;
+	top: -5px;
+	right: -5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 57px;
+	height: 57px;
+	background: #86CDDD;
+	font-size: 80px;
+	/* line-height: 20px; */
+	font-weight: 400;
+	text-decoration: none;
+	border-radius: 50%;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	transition: background 0.2s, color 0.2s;
+	border: 1px solid #ffffff;
+	z-index: 99;
+	cursor: pointer;
+	padding: 3px 0 0 0;
+}
+
+#exit::before
+{
+	content: "×";
+	/* Unicode multiplication sign looks cleaner than "x" */
+}
+
+#exit:hover
+{}
+
+
+
+
 
 /* clearfix for the float */
 #userForm::after
