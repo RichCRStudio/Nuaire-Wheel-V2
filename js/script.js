@@ -1,5 +1,7 @@
 (function ()
 {
+	// --- Data storage ---
+	const LS_KEY = "prizes_minimal_v2";
 	const FORM_KEY = "wheel_users";
 
 	const formWrap = document.getElementById("userFormWrap");
@@ -174,12 +176,9 @@
 					return;
 				}
 				showLanding();
-			}, 5000);
+			}, 6500);
 		}, 0);
 	}
-
-	// --- Data storage ---
-	const LS_KEY = "prizes_minimal_v2";
 
 	function getLocalPrizes()
 	{
@@ -324,7 +323,7 @@
 			div.style.alignItems = "center";
 			div.style.justifyContent = "center";
 			div.style.textAlign = "center";
-			div.style.fontWeight = "700";
+			div.style.fontWeight = "900";
 			div.style.color = "#fff";
 			div.style.lineHeight = "1.1";
 			div.style.wordBreak = "break-word";
@@ -534,9 +533,47 @@
 		}
 	}
 
+
+
+
+	// Try to seed localStorage from initData (provided by const.js)
+	function seedFromInitDataIfNeeded()
+	{
+		// If prizes already exist, do nothing
+		if (localStorage.getItem(LS_KEY)) return false;
+
+		console.log(initData);
+		// Normalise to our minimal schema: { name, enabled, stock }
+		const rows = initData.map((p) =>
+		{
+			// common field fallbacks
+			const name = String(p.name ?? p.prize ?? "").trim();
+			const enabled = (p.enabled != null)
+				? String(p.enabled).toUpperCase() // "TRUE"/"FALSE"
+				: "TRUE";
+			const stock = Number(
+				p.stock ?? p.qty ?? p.quantity ?? 0
+			);
+
+			return { name, enabled, stock: isFinite(stock) ? stock : 0 };
+		})
+			// keep only valid
+			.filter(r => r.name.length > 0);
+
+		console.log(4);
+		if (rows.length === 0) return false;
+
+		setLocalPrizes(rows);
+		return true;
+	}
+
+
 	// --- Data/load ---
 	function loadData()
 	{
+		// NEW: seed from initData (const.js) if nothing stored yet
+		seedFromInitDataIfNeeded();
+
 		const all = getLocalPrizes();
 		const active = all.filter(p => String(p.enabled).toUpperCase() === 'TRUE' && Number(p.stock) > 0);
 
@@ -544,7 +581,7 @@
 		{
 			toggleSoldOutUI(true);
 			const log = document.getElementById('log');
-			if (log) log.textContent = 'All prizes are out of stock.';
+			//if (log) log.textContent = 'All prizes are out of stock.';
 			return false;
 		}
 
@@ -554,9 +591,12 @@
 		N = names.length;
 		slice = N ? (2 * Math.PI) / N : 0;
 		buildWheel();
-		log.textContent = N ? '' : 'No prizes. Open config.html → insert sample → save → Reload.';
+		//log.textContent = N ? '' : 'No prizes. Open config.html → insert sample → save → Reload.';
 		return true;
 	}
+
+
+
 
 	// --- Spin ---
 	function positiveMod(a, n)
@@ -877,5 +917,7 @@
 		const clickedAnInput = [...fields].some((el) => el === target || el.contains(target));
 		if (!clickedAnInput && !kb.contains(target)) hideKB();
 	});
+
+
 })();
 

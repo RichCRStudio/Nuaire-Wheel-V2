@@ -80,7 +80,7 @@ h1,
 {
 	font-family: 'ProximaNova', sans-serif;
 	font-weight: 900;
-	font-size: calc(var(--fs-h1) / 1rem * 1rem);
+	font-size: var(--fs-h1);
 	line-height: var(--lh-heading);
 	margin: 0 0 var(--space-3);
 }
@@ -153,6 +153,19 @@ button,
 	min-height: var(--touch-target);
 }
 
+input::placeholder
+{
+	color: #999;
+	/* visible */
+	opacity: 1;
+	/* Chrome sometimes reduces opacity */
+}
+
+input:focus::placeholder
+{
+	color: #999;
+	/* keep it visible */
+}
 
 /* ------------------------------------
 HTML
@@ -606,10 +619,11 @@ div
 }
 
 /* hide the tiny “Name:”/“Company:”/“Email:” captions */
-#userForm label:has(> input[type="text"]),
-#userForm label:has(> input[type="email"])
+#userForm label[for="name"],
+#userForm label[for="company"],
+#userForm label[for="email"]
 {
-	font-size: 0;
+	display: none;
 }
 
 /* text inputs: chunky rounded, white fill */
@@ -705,7 +719,7 @@ input[type="checkbox"]:checked::after
 	border: 1px solid #ffffff;
 	background: #86CDDD;
 	color: #fff;
-	font-weight: 700;
+	font-weight: 900;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
 	cursor: pointer;
