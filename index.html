@@ -47,7 +47,7 @@
 
 	<div id="userFormWrap" class="fade">
 
-		<h2 class="form-title">ENTER AND WIN!</h2>
+		<h1 class="form-title">ENTER AND WIN!</h1>
 
 		<form id="userForm">
 			<label>
@@ -62,15 +62,20 @@
 				Email:
 				<input type="email" id="email" placeholder="Email" required value="dummy@cr.studio">
 			</label>
-			<label>
-				<input type="checkbox" id="terms" required checked="checked">
-				I agree to the <a href="#" id="termsLink" />terms & privacy policy</a>
-			</label>
-			<label>
-				<input type="checkbox" id="marketing">
-				I’d like to receive <a href="#" target="_blank" />marketing updates</a>
-			</label>
-			<button type="submit">Submit</button>
+
+			<div id="userFormControls">
+				<label>
+					<input type="checkbox" id="terms" required checked="checked">
+					<a href="#" id="termsLink" />Terms & Privacy</a>
+				</label>
+
+				<label>
+					<input type="checkbox" id="marketing">
+					Marketing Opt-in
+				</label>
+				<button type="submit">Submit</button>
+			</div>
+
 		</form>
 	</div>
 
@@ -186,6 +191,14 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Fullscreen video overlay -->
+	<!--
+	<div id="confettiOverlay">
+		<video autoplay muted playsinline loop>
+			<source src="videos/confetti.webm" type="video/webm">
+		</video>
+	</div>-->
 
 
 

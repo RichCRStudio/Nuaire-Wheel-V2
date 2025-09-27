@@ -175,7 +175,7 @@
 				}
 				showLanding();
 			}, 5000);
-		}, 2000);
+		}, 0);
 	}
 
 	// --- Data storage ---
@@ -483,6 +483,30 @@
 
 		svg.appendChild(g);
 	}
+
+
+
+
+
+
+
+	const termsLink = document.getElementById('termsLink');
+	const closeTerms = document.getElementById('closeTerms');
+	termsLink.addEventListener('click', function (e)
+	{
+		e.preventDefault();
+		document.getElementById('termsModal').style.display = 'flex';
+	});
+
+	closeTerms.addEventListener('click', function (e)
+	{
+		e.preventDefault();
+		document.getElementById('termsModal').style.display = 'none';
+	});
+
+
+
+
 
 	function toggleSoldOutUI(isSoldOut)
 	{
