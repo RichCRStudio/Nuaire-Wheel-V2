@@ -373,15 +373,6 @@ div
 	z-index: 5;
 }
 
-#podium-img
-{
-	position: relative;
-	z-index: 3;
-	margin-top: -100px;
-}
-
-
-
 
 
 /* Full-screen congrats overlay (hidden by default) */
@@ -398,6 +389,7 @@ div
 	transition: opacity 250ms ease;
 	background: #000;
 	/* optional black bg behind video */
+	z-index: 15;
 }
 
 /* Show state */
@@ -505,10 +497,10 @@ div
 /* Top-centered brand logo */
 #brandLogo
 {
-	width: 100%;
+	width: 546px;
 	position: relative;
 	margin-left: 50%;
-	margin-top: 105px;
+	margin-top: 58px;
 	transform: translateX(-50%);
 	z-index: 6;
 	pointer-events: none;
@@ -539,18 +531,6 @@ div
 	/* don't block clicks */
 }
 
-/* Fullscreen confetti canvas */
-#confettiCanvas
-{
-	position: fixed;
-	inset: 0;
-	width: 100vw;
-	height: 100vh;
-	z-index: 4;
-	/* below top gradient (5) and logo/button (6+/12), above background */
-	pointer-events: none;
-	/* never block clicks */
-}
 
 .fade
 {
@@ -917,16 +897,22 @@ input[type="checkbox"]:checked::after
 /* Overlay container */
 #confettiOverlay
 {
+	opacity: 1;
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background: black;
 	/* fallback */
-	z-index: 99999;
+	z-index: 7;
 	/* on top of everything */
 	overflow: hidden;
+	pointer-events: none;
+}
+
+#confettiOverlay.show
+{
+	opacity: 1;
 }
 
 /* Video styling */

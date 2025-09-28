@@ -5,6 +5,7 @@
 	const FORM_KEY = "wheel_users";
 
 	const formWrap = document.getElementById("userFormWrap");
+	const confettiOverlay = document.getElementById("confettiOverlay");
 	const form = document.getElementById("userForm");
 	const wheelWrap = document.getElementById("wheelWrap");
 	const congratsMsg = document.getElementById("congratsMsg");
@@ -31,6 +32,7 @@
 		}
 		landing?.classList.remove('hide');
 		formWrap?.classList.remove('show');
+		confettiOverlay?.classList.remove('show');
 		wheelWrap?.classList.remove('show');
 		congratsMsg?.classList.remove('show');
 		soldOutMsg?.classList.remove('show');
@@ -120,6 +122,7 @@
 		formWrap.classList.add("show");
 		wheelWrap.classList.remove("show");
 		congratsMsg.classList.remove("show");
+		confettiOverlay?.classList.add('show');
 	}
 
 	function showWheel()
@@ -169,6 +172,7 @@
 			setTimeout(() =>
 			{
 				congratsMsg?.classList.remove("show");
+				confettiOverlay?.classList.remove('show');
 				const stillHasPrizes = loadData();
 				if (!stillHasPrizes)
 				{
@@ -524,6 +528,7 @@
 		{
 			landing?.classList.add('hide');
 			formWrap?.classList.remove('show');
+			confettiOverlay?.classList.remove('show');
 			wheelWrap?.classList.remove('show');
 			congratsMsg?.classList.remove('show');
 			soldOutMsg?.classList.add('show');
