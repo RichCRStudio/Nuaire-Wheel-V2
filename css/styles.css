@@ -502,9 +502,15 @@ div
 	margin-left: 50%;
 	margin-top: 58px;
 	transform: translateX(-50%);
-	z-index: 6;
+	z-index: 999999;
 	pointer-events: none;
 	text-align: center;
+	display: none;
+}
+
+#brandLogo.show
+{
+	display: block;
 }
 
 #brandLogo img

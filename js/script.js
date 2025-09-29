@@ -10,6 +10,7 @@
 	const wheelWrap = document.getElementById("wheelWrap");
 	const congratsMsg = document.getElementById("congratsMsg");
 	const soldOutMsg = document.getElementById("soldOutMsg");
+	const brandLogo = document.getElementById("brandLogo");
 
 	// --- Landing overlay (tap-only, no auto-advance) ---
 	const landing = document.getElementById("landing");
@@ -36,6 +37,8 @@
 		wheelWrap?.classList.remove('show');
 		congratsMsg?.classList.remove('show');
 		soldOutMsg?.classList.remove('show');
+		brandLogo?.classList.remove('show');
+
 
 		landingFinished = false;
 		advancing = false;
@@ -74,6 +77,9 @@
 
 	function advanceLanding()
 	{
+
+		brandLogo?.classList.add('show');
+
 		if (advancing || landingFinished) return;
 		advancing = true;
 
@@ -160,6 +166,7 @@
 		setTimeout(() =>
 		{
 			congratsMsg?.classList.add("show");
+			brandLogo?.classList.remove('show');
 
 			const video = document.getElementById("congratsVideo");
 			if (video)
