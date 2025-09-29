@@ -498,8 +498,8 @@ div
 #brandLogo
 {
 	width: 100%;
+	height: 300px;
 	position: relative;
-	margin-top: 0;
 	z-index: 999999;
 	pointer-events: none;
 	text-align: center;
@@ -513,25 +513,9 @@ div
 
 #brandLogo img
 {
+	position: absolute;
 	width: 100%;
-}
-
-/* Top gradient backdrop behind the logo (non-interactive) */
-#brandTopGradient
-{
-	position: fixed;
-	top: 0;
 	left: 0;
-	width: 100%;
-	height: 160px;
-	/* adjust if needed */
-	background: linear-gradient(to bottom,
-			rgba(0, 0, 0, 0.6),
-			rgba(0, 0, 0, 0));
-	z-index: 5;
-	/* just below #brandLogo (z = 6) */
-	pointer-events: none;
-	/* don't block clicks */
 }
 
 
@@ -900,7 +884,7 @@ input[type="checkbox"]:checked::after
 /* Overlay container */
 #confettiOverlay
 {
-	opacity: 1;
+	opacity: 0;
 	position: fixed;
 	top: 0;
 	left: 0;

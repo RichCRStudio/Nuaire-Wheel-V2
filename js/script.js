@@ -166,7 +166,6 @@
 		setTimeout(() =>
 		{
 			congratsMsg?.classList.add("show");
-			brandLogo?.classList.remove('show');
 
 			const video = document.getElementById("congratsVideo");
 			if (video)
@@ -232,7 +231,7 @@
 		const logoSize = Math.floor(centerRimRadius * 1.6);
 		const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
 		img.id = "logoStatic";
-		img.setAttribute("href", "img/nuaire-logo.png");
+		img.setAttribute("href", "img/nuaire-logo-small.png");
 		img.setAttribute("width", logoSize);
 		img.setAttribute("height", logoSize);
 		img.setAttribute("x", -logoSize / 2);
